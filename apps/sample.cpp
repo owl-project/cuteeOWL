@@ -20,11 +20,40 @@
 
 #include "owlQT/OWLViewer.h"
 
+struct SampleViewer : public owlQT::OWLViewer{
+  
+  void render() override
+  {
+    /* compute a simple test pattern ..... of course, we _should_ be
+       doin that in cuda on the device, but for now let's keep the
+       camkefile simple and just do it on the host, then copy to
+       device FB */
+    static int g_frameID = 0;
+    int frameID = g_frameID++;
+
+    std::vector<int> hostFB(fbSize.x*fbSize.y);
+    for (int iy=0;iy<fbSize.y;iy++)
+      for (int ix=0;ix<fbSize.x;ix++) {
+        int r = (ix+frameID)%256;
+        int g = (iy+frameID)%256;
+        int b = (ix+iy+frameID)%256;
+        int rgba
+          = (r<<0)
+          | (g<<8)
+          | (b<<16)
+          | (255<<24);
+        hostFB[fbSize.x*iy+ix] = rgba;
+      }
+    cudaMemcpy(fbPointer,hostFB.data(),hostFB.size()*sizeof(int),cudaMemcpyDefault);
+  }
+  
+};
+
 int main(int argc, char **argv)
 {
   QApplication app(argc,argv);
   
-  owlQT::OWLViewer viewer;
+  SampleViewer viewer;
   viewer.show();
   // QPushButton button("Hello World!");
   // button.show();

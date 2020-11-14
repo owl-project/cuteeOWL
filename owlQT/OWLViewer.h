@@ -136,9 +136,10 @@ namespace owlQT {
 
     /*! this gets called when the user presses a key on the keyboard ... */
     virtual void key(char key, const vec2i &/*where*/);
+    
     /*! this gets called when the user presses a 'special' key on
       the keyboard (cursor keys) ... */
-    virtual void special(int key, int mods, const vec2i &/*where*/);
+    virtual void special(QKeyEvent *event, const vec2i &/*where*/);
 
     /*! set a new window aspect ratio for the camera, update the
       camera, and notify the app */
@@ -259,6 +260,9 @@ namespace owlQT {
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    // void resizeEvent(QResizeEvent* event) override;
+
 
   private:
     // void makeObject();
