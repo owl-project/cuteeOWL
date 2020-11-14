@@ -211,6 +211,12 @@ namespace owlQT {
   void OWLViewer::paintGL()
   {
 #if 1
+    static double lastCameraUpdate = -1.f;
+    if (camera.lastModified != lastCameraUpdate) {
+      cameraChanged();
+      lastCameraUpdate = camera.lastModified;
+    }
+    
     // call virtual render method that asks child class to render into
     // the fbPointer/frame buffer texture....
     render();
@@ -240,6 +246,13 @@ namespace owlQT {
     //     glDrawArrays(GL_TRIANGLE_FAN, i * 4, 4);
     // }
 #endif
+  }
+
+  vec2i OWLViewer::getMousePos() const
+  {
+    QPoint p = mapFromGlobal(QCursor::pos());
+    vec2i where = {p.x(),p.y()};
+    return where;
   }
 
   void OWLViewer::keyPressEvent(QKeyEvent *event)
@@ -279,30 +292,6 @@ namespace owlQT {
     resize({width,height});
     // int side = qMin(width, height);
     // glViewport((width - side) / 2, (height - side) / 2, side, side);
-  }
-
-  void OWLViewer::mousePressEvent(QMouseEvent *event)
-  {
-    lastPos = event->pos();
-  }
-
-  void OWLViewer::mouseMoveEvent(QMouseEvent *event)
-  {
-    int dx = event->x() - lastPos.x();
-    int dy = event->y() - lastPos.y();
-
-    printf("mouse %i %i\n",dx,dy);
-    // if (event->buttons() & Qt::LeftButton) {
-    //     rotateBy(8 * dy, 8 * dx, 0);
-    // } else if (event->buttons() & Qt::RightButton) {
-    //     rotateBy(8 * dy, 0, 8 * dx);
-    // }
-    lastPos = event->pos();
-  }
-
-  void OWLViewer::mouseReleaseEvent(QMouseEvent * /* event */)
-  {
-    emit clicked();
   }
 
   // void OWLViewer::makeObject()
@@ -665,4 +654,109 @@ namespace owlQT {
   }
 
   
+  void OWLViewer::mousePressEvent(QMouseEvent *event)
+  {
+    const bool pressed = true;//(action == GLFW_PRESS);
+    lastMousePos = getMousePos();
+    switch(event->button()) {
+    case Qt::LeftButton://GLFW_MOUSE_BUTTON_LEFT:
+      leftButton.isPressed        = pressed;
+      // leftButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
+      // leftButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
+      // leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
+      mouseButtonLeft(lastMousePos, pressed);
+      break;
+    case Qt::MidButton://GLFW_MOUSE_BUTTON_MIDDLE:
+      centerButton.isPressed = pressed;
+      // centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
+      // centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
+      // centerButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
+      mouseButtonCenter(lastMousePos, pressed);
+      break;
+    case Qt::RightButton://GLFW_MOUSE_BUTTON_RIGHT:
+      rightButton.isPressed = pressed;
+      // rightButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
+      // rightButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
+      // rightButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
+      mouseButtonRight(lastMousePos, pressed);
+      break;
+    }
+    // // lastPos = event->pos();
+  }
+  
+  void OWLViewer::mouseMoveEvent(QMouseEvent *event)
+  {
+    mouseMotion({event->x(),event->y()});
+    // if (event->button()) {
+    //   PING;
+    //   PRINT(event->button());
+    // };
+    // int dx = event->x() - lastPos.x();
+    // int dy = event->y() - lastPos.y();
+
+    // printf("mouse %i %i\n",dx,dy);
+    // // if (event->buttons() & Qt::LeftButton) {
+    // //     rotateBy(8 * dy, 8 * dx, 0);
+    // // } else if (event->buttons() & Qt::RightButton) {
+    // //     rotateBy(8 * dy, 0, 8 * dx);
+    // // }
+    // lastPos = event->pos();
+  }
+
+  void OWLViewer::mouseReleaseEvent(QMouseEvent *event)
+  {
+    const bool pressed = false;//(action == GLFW_PRESS);
+    lastMousePos = getMousePos();
+    switch(event->button()) {
+    case Qt::LeftButton://GLFW_MOUSE_BUTTON_LEFT:
+      leftButton.isPressed        = pressed;
+      // leftButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
+      // leftButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
+      // leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
+      mouseButtonLeft(lastMousePos, pressed);
+      break;
+    case Qt::MidButton://GLFW_MOUSE_BUTTON_MIDDLE:
+      centerButton.isPressed = pressed;
+      // centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
+      // centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
+      // centerButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
+      mouseButtonCenter(lastMousePos, pressed);
+      break;
+    case Qt::RightButton://GLFW_MOUSE_BUTTON_RIGHT:
+      rightButton.isPressed = pressed;
+      // rightButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
+      // rightButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
+      // rightButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
+      mouseButtonRight(lastMousePos, pressed);
+      break;
+    }
+    // // lastPos = event->pos();
+    // const bool pressed = false;//true;//(action == GLFW_PRESS);
+    //   lastMousePos = getMousePos();
+    //   switch(button) {
+    //   case GLFW_MOUSE_BUTTON_LEFT:
+    //     leftButton.isPressed        = pressed;
+    //     leftButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
+    //     leftButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
+    //     leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
+    //     mouseButtonLeft(lastMousePos, pressed);
+    //     break;
+    //   case GLFW_MOUSE_BUTTON_MIDDLE:
+    //     centerButton.isPressed = pressed;
+    //     centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
+    //     centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
+    //     centerButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
+    //     mouseButtonCenter(lastMousePos, pressed);
+    //     break;
+    //   case GLFW_MOUSE_BUTTON_RIGHT:
+    //     rightButton.isPressed = pressed;
+    //     rightButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
+    //     rightButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
+    //     rightButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
+    //     mouseButtonRight(lastMousePos, pressed);
+    //     break;
+    //   }
+    emit clicked();
+  }
+
 }
