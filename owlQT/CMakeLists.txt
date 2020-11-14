@@ -14,60 +14,26 @@
 # limitations under the License.                                           #
 # ======================================================================== #
 
-if (POLICY CMP0048)
-  cmake_policy(SET CMP0048 NEW)
-endif()
-project(Optix-OWL VERSION 0.0.1)
-cmake_minimum_required(VERSION 3.16)
-
-project(OWLQTViewer)
-
-#find_package(Qt4 COMPONENTS QTCORE QTGUI)
-#find_package(
-find_package(Qt5Widgets REQUIRED)
-
+# Tell CMake to run moc when necessary:
+set(CMAKE_AUTOMOC ON)
 # As moc files are generated in the binary dir, tell CMake
 # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+include_directories(${OWL_INCLUDES})
 
-if (NOT (TARGET owl))
-  message("owl hasn't been included yet...")
-  add_subdirectory(../owl external_owl EXCLUDE_FROM_ALL)
-endif()
-include(configure_build_type.cmake)
-
-
-add_subdirectory(owlQT)
-
-#include_directories(${Qt5Widgets_INCLUDES})
-#add_definitions(${Qt5Widgets_DEFINITIONS})
-#set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
- 
-#add_library(owlQTViewer STATIC
-#  owlViewer/OWLViewerWidget.cpp
-#  )
-#qt5_use_modules(owlQTViewer Widgets)
-
-
-
-
-# Tell CMake to run moc when necessary:
-set(CMAKE_AUTOMOC ON)
-
-include_directories(${OWL_QT_INCLUDES})
-add_executable(sampleViewer
-  apps/sample.cpp
+add_library(owlQT STATIC
+  OWLViewer.cpp
   )
-#target_link_libraries(
-#  firstTest
-#  ${Qt5Widgets_LIBRARIES}
-#  )
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/owlViewer)
+qt5_use_modules(owlQT
+  Widgets
+  )
 
-OWL_QT_LINK(sampleViewer)
-
-#qt5_use_modules(sampleViewer Widgets)
-#target_link_libraries(sampleViewer
-#  ${OWL_QT_LIBRARIES}
-#  )
+set(OWL_QT_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/.. ${OWL_INCLUDES} PARENT_SCOPE)
+set(OWL_QT_LIBRARIES owlQT PARENT_SCOPE)
+  
+macro(OWL_QT_LINK target)
+  target_link_libraries(${target} ${OWL_QT_LIBRARIES})
+  message("linking ${target} to ${OWL_QT_LIBRARIES}")
+  qt5_use_modules(${target} Widgets)
+endmacro()
