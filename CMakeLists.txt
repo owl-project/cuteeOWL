@@ -30,44 +30,34 @@ find_package(Qt5Widgets REQUIRED)
 # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# ------------------------------------------------------------------
+# add owl, for vec3f stuff used in viewer
+# ------------------------------------------------------------------
+message("owl hasn't been included yet...")
+set(owl_dir ${CMAKE_CURRENT_SOURCE_DIR}/../owl)
+add_subdirectory(${owl_dir} external_owl EXCLUDE_FROM_ALL)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${owl_dir}/owl/cmake/")
+include(configure_build_type)
 
-if (NOT (TARGET owl))
-  message("owl hasn't been included yet...")
-  add_subdirectory(../owl external_owl EXCLUDE_FROM_ALL)
-endif()
-include(configure_build_type.cmake)
 
-
+# ------------------------------------------------------------------
+# the owlQT library with viewer widget etc
+# ------------------------------------------------------------------
 add_subdirectory(owlQT)
 
-#include_directories(${Qt5Widgets_INCLUDES})
-#add_definitions(${Qt5Widgets_DEFINITIONS})
-#set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
- 
-#add_library(owlQTViewer STATIC
-#  owlViewer/OWLViewerWidget.cpp
-#  )
-#qt5_use_modules(owlQTViewer Widgets)
 
 
-
+# ------------------------------------------------------------------
+# sample app(s)
+# ------------------------------------------------------------------
 
 # Tell CMake to run moc when necessary:
 set(CMAKE_AUTOMOC ON)
 
 include_directories(${OWL_QT_INCLUDES})
+
 add_executable(sampleViewer
   apps/sample.cpp
   )
-#target_link_libraries(
-#  firstTest
-#  ${Qt5Widgets_LIBRARIES}
-#  )
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/owlViewer)
 
 OWL_QT_LINK(sampleViewer)
-
-#qt5_use_modules(sampleViewer Widgets)
-#target_link_libraries(sampleViewer
-#  ${OWL_QT_LIBRARIES}
-#  )
