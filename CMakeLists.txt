@@ -43,8 +43,8 @@ include(configure_build_type)
 # ------------------------------------------------------------------
 # the owlQT library with viewer widget etc
 # ------------------------------------------------------------------
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(owlQT)
-
 
 
 # ------------------------------------------------------------------

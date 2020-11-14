@@ -21,9 +21,18 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(${OWL_INCLUDES})
-
+find_package(OpenGL REQUIRED)
+find_package(CUDA REQUIRED)
 add_library(owlQT STATIC
   OWLViewer.cpp
+  InspectMode.cpp
+  FlyMode.cpp
+  Camera.cpp
+  )
+target_link_libraries(owlQT
+  ${OPENGL_opengl_LIBRARY}
+  ${CUDA_CUDA_LIBRARY}
+  ${CUDA_CUDART_LIBRARY}
   )
 qt5_use_modules(owlQT
   Widgets
