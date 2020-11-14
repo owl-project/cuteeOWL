@@ -267,14 +267,14 @@ namespace owlQT {
   private:
     // void makeObject();
 
-    QColor clearColor = Qt::black;
-    QPoint lastPos;
+    // QColor clearColor = Qt::black;
+    // QPoint lastPos;
     // int xRot = 0;
     // int yRot = 0;
     // int zRot = 0;
     // QOpenGLTexture *textures[6] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
     // QOpenGLShaderProgram *program = nullptr;
-    QOpenGLBuffer vbo;
+    // QOpenGLBuffer vbo;
     QTimer timer;
   };
 }

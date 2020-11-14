@@ -17,6 +17,8 @@
 #include <QApplication>
 #include <QPushButton>
 #include <QMainWindow>
+#include <QLabel>
+#include <QVBoxLayout>
 
 #include "owlQT/OWLViewer.h"
 
@@ -69,9 +71,23 @@ namespace owlQT {
     // QPushButton button("Hello World!");
     // button.show();
 
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(new QLabel("Hello World from QT Label"));
+    layout->addWidget(new QPushButton("Button Test"));
+    
+    QWidget *window = new QWidget();
+    window->setLayout(layout);
+    
+    // Set QWidget as the central layout of the main window
     QMainWindow secondWindow;
-    QPushButton button2("Hello World!",&secondWindow);
-    button2.show();
+    secondWindow.setCentralWidget(window);
+      
+    // secondWindow.setLayout(layout);
+    
+    // QLabel label("Hello World from QT Label",&secondWindow);
+    // label.show();
+    // QPushButton button2("QTButton Test",&secondWindow);
+    // button2.show();
     // OWLViewerWidget viewer(secondWindow);
     // secondWindow.setWindowFlags(Qt::Window | Qt::FramelessWindowHint); 
     secondWindow.show();
