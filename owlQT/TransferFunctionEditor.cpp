@@ -24,24 +24,35 @@
 
 namespace owlQT {
 
-  AlphaEditor::AlphaEditor()
+  AlphaEditor::AlphaEditor(const ColorMap &cm)
+    : xf(cm)
   {
-    const int N = 128;
+    // const int N = 128;
     
-    const vec4f xf0(0.f,0.f,1.f,0.f);
-    const vec4f xf1(1.f,0.f,0.f,1.f);;
-    for (int i=0;i<N;i++) {
-      float f = i / (N-1.f);
-      xf.push_back((1.f-f)*xf0+f*xf1);
-    }
+    // const vec4f xf0(0.f,0.f,1.f,0.f);
+    // const vec4f xf1(1.f,0.f,0.f,1.f);;
+    // for (int i=0;i<N;i++) {
+    //   float f = i / (N-1.f);
+    //   xf.push_back((1.f-f)*xf0+f*xf1);
+    // }
   }
   
   AlphaEditor::~AlphaEditor()
   {}
 
-  void AlphaEditor::setColorMap(const ColorMap &cm)
+  void AlphaEditor::setColorMap(const ColorMap &cm,
+                                SetColorMapModeMode mode)
   {
-    xf = cm;
+    if (mode == AlphaEditor::KEEP_ALPHA) {
+      if (cm.size() != xf.size())
+        throw std::runtime_error("invalid attempt to apply color channels "
+                                 "from other color map of different size!?");
+      for (int i=0;i<cm.size();i++)
+        xf[i] = vec4f(vec3f(cm[i]),xf[i].w);
+      
+    } else {
+      xf = cm;
+    }
     
     emit colorMapChanged();
     update();
@@ -131,32 +142,57 @@ namespace owlQT {
     // ------------------------------------------------------------------
     // draw the histogram
     // ------------------------------------------------------------------
-    if (!histogram.empty()) {
-      glColor4f(1.f-bgColor.redF(),
-                1.f-bgColor.greenF(),
-                1.f-bgColor.blueF(),
-                1.f);
-      float maxHistogramValue = 0.f;
-      for (auto v : histogram)
-        maxHistogramValue = std::max(maxHistogramValue,v);
-      glPushMatrix();
-      {
-        glTranslatef(0.f,histogramHeight,1.f);
-        glScalef(1.f,1.f-histogramHeight,1.f);
-        for (int i=0;i<histogram.size();i++) {
-          float x0 = (i+0) / float(histogram.size());
-          float x1 = (i+1) / float(histogram.size());
-          float height = histogram[i]/maxHistogramValue;
-          
-          glVertex2f( x0,0.f );
-          glVertex2f( x0,height );
-          
-          glVertex2f( x1,height );
-          glVertex2f( x1,0.f );
-        }
+    glColor4f(1.f-bgColor.redF(),
+              1.f-bgColor.greenF(),
+              1.f-bgColor.blueF(),
+              1.f);
+    float maxHistogramValue = 0.f;
+    for (auto v : histogram)
+      maxHistogramValue = std::max(maxHistogramValue,v);
+    glPushMatrix();
+    {
+      // glTranslatef(0.f,0.f,1.f);
+      glScalef(1.f,histogramHeight,1.f);
+      for (int i=0;i<histogram.size();i++) {
+        float x0 = (i+0) / float(histogram.size());
+        float x1 = (i+1) / float(histogram.size());
+        float height = histogram[i]/maxHistogramValue;
+        
+        glVertex2f( x0,0.f );
+        glVertex2f( x0,height );
+        
+        glVertex2f( x1,height );
+        glVertex2f( x1,0.f );
       }
-      glPopMatrix();
+      
+      // // ------------------------------------------------------------------
+      // // draw a rectangle aroundit all, to show that histogram area
+      // // belongs to this widget ...
+      // // ------------------------------------------------------------------
+      // glBegin( GL_LINE_STRIP );
+      // glVertex2f( 1e-5f,1e-5f );
+      // glVertex2f( 1,1e-5f );
+      // glVertex2f( 1,1 );
+      // glVertex2f( 1e-5f,1 );
+      // glVertex2f( 1e-5f,1e-5f );
+      // glEnd();
     }
+    if (histogram.empty()) {
+      vec3f bg(bgColor.redF(),bgColor.greenF(),bgColor.blueF());
+      vec3f color = .8f*bg + 0.2f*(1.f-bg);
+      glColor4f(color.x,color.y,color.z,1.f);
+      glBegin( GL_QUADS );
+      {
+        glVertex2f( 0,0 );
+        glVertex2f( 0,1 );
+        glVertex2f( 1,1 );
+        glVertex2f( 1,0 );
+      }
+      glEnd();
+    }
+    
+    glPopMatrix();
+    
     // doneCurrent();
   }
 

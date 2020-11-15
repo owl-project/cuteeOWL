@@ -21,6 +21,12 @@
 #include <QOpenGLBuffer>
 #include <QTimer>
 
+#include <QLabel>
+#include <QComboBox>
+#include <QVBoxLayout>
+#include <QFormLayout>
+#include <QDoubleSpinBox>
+
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
 
@@ -29,6 +35,8 @@ namespace owlQT {
   using namespace owl;
   using namespace owl::common;
 
+  typedef interval<float> range1f;
+  
   /*! a widget that displays - and allows to draw into the alpha
       channel of - a "color+alpha" transfer function. The widget
       consists of two halves - the upper 80% displays the current
@@ -49,11 +57,12 @@ namespace owlQT {
   public:
     using QOpenGLWidget::QOpenGLWidget;
 
-    AlphaEditor();
+    AlphaEditor(const ColorMap &cm);
     ~AlphaEditor();
 
+    typedef enum { KEEP_ALPHA, OVERWRITE_ALPHA } SetColorMapModeMode;
     
-    void setColorMap(const ColorMap &cm);
+    void setColorMap(const ColorMap &cm, SetColorMapModeMode mode);
 
 
     // ------------------------------------------------------------------
@@ -104,7 +113,74 @@ namespace owlQT {
   };
 
 
-  // struct XFEditor : public QWidget {
-  // };
-  
+
+  struct XFEditor : public QWidget
+  {
+    Q_OBJECT
+
+  public:
+    XFEditor()
+    {
+      QGridLayout *rangeLayout = new QGridLayout;//(2,2);
+      
+      domain_lower = new QDoubleSpinBox;
+      domain_upper = new QDoubleSpinBox;
+
+      range1f domain(0.f,1.f);
+      domain_lower->setValue(domain.lower);
+      domain_lower->setRange(domain.lower,domain.upper);
+      domain_lower->setSingleStep((domain.upper-domain.lower)/40.f);
+
+      domain_upper->setValue(domain.upper);
+      domain_upper->setRange(domain.lower,domain.upper);
+      domain_upper->setSingleStep((domain.upper-domain.lower)/40.f);
+
+      rangeLayout->addWidget(new QLabel("upper"),0,0);
+      rangeLayout->addWidget(domain_lower,1,0);
+      rangeLayout->addWidget(new QLabel("upper"),0,1);
+      rangeLayout->addWidget(domain_upper,1,1);
+      QWidget *rangeWidget = new QWidget;
+      rangeWidget->setLayout(rangeLayout);
+      
+      alphaEditor = new AlphaEditor(colorMaps.getMap(0));
+      
+      cmSelector = new QComboBox;
+      for (auto cmName : colorMaps.getNames())
+        cmSelector->addItem(QString(cmName.c_str()));
+
+      layout = new QFormLayout;
+      layout->addWidget(alphaEditor);
+      layout->addWidget(cmSelector);
+
+      
+      layout->addWidget(rangeWidget);
+      setLayout(layout);
+      
+      // connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
+      connect(cmSelector, SIGNAL(currentIndexChanged(int)),
+              this, SLOT(cmSelectionChanged(int)));
+    }
+
+  public slots:
+    /*! we'll have the qcombobox that selsects the desired color map
+      call this, and then update the alpha editor */
+    void cmSelectionChanged(int idx)
+    {
+      alphaEditor->setColorMap(colorMaps.getMap(idx),AlphaEditor::KEEP_ALPHA);
+    }
+    
+  signals:
+    /*! this gets emitted every time the app 'might' want to check
+        that the color map got changed (either by drawing into, or by
+        selecting a new color map */
+    void colorMapChanged();
+
+  private:
+    AlphaEditor *alphaEditor;
+    QFormLayout *layout;
+    ColorMapLibrary colorMaps;
+    QComboBox *cmSelector;
+    QDoubleSpinBox *domain_lower, *domain_upper;
+  };
+
 }

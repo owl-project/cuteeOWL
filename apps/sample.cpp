@@ -57,12 +57,11 @@ namespace owlQT {
     void cameraChanged() override
     {
       const owlQT::SimpleCamera camera = getSimplifiedCamera();
-      PRINT(camera.lens.center);
-      PRINT(camera.screen.lower_left);
     }
   
   };
 
+  
   extern "C" int main(int argc, char **argv)
   {
     QApplication app(argc,argv);
@@ -72,55 +71,20 @@ namespace owlQT {
     const box3f worldBounds(vec3f(-1),vec3f(+1));
     viewer.enableFlyMode();
     viewer.enableInspectMode(worldBounds);
-    // QPushButton button("Hello World!");
-    // button.show();
 
 
-    AlphaEditor *ae = new AlphaEditor;
-    ColorMapLibrary colorMaps;
-    ae->setColorMap(colorMaps.getMap(0));
-
-    QFormLayout *layout = new QFormLayout;
-
-    QComboBox *cmSelector = new QComboBox;
-    for (auto cmName : colorMaps.getNames())
-      cmSelector->addItem(QString(cmName.c_str()));
-         
-    layout->addWidget(new QLabel("Hello World from QT Label"));
-    layout->addWidget(new QPushButton("Button Test"));
-    layout->addWidget(ae);
-    layout->addWidget(cmSelector);
-
-    // QVBoxLayout *topLayout = new QVBoxLayout;
-    // topLayout->addWidget(new QLabel("Hello World from QT Label"));
-    // topLayout->addWidget(new QPushButton("Button Test"));
-    // // topLayout->setSizeConstraint(QLayout::SetFixedSize);
-
-    
-    // BorderLayout *borderLayout = new BorderLayout;
-    // borderLayout->addLayout(layout,BorderLayout::North);
-    // borderLayout->addWidget(ae,BorderLayout::Center);
-    
-    QWidget *window = new QWidget();
-    window->setLayout(layout);
+    XFEditor    *xfEditor = new XFEditor;
+    QFormLayout *layout   = new QFormLayout;
+    layout->addWidget(xfEditor);
     
     // Set QWidget as the central layout of the main window
     QMainWindow secondWindow;
-    secondWindow.setCentralWidget(window);
+    secondWindow.setCentralWidget(xfEditor);
       
-    // secondWindow.setLayout(layout);
-    
-    // QLabel label("Hello World from QT Label",&secondWindow);
-    // label.show();
-    // QPushButton button2("QTButton Test",&secondWindow);
-    // button2.show();
-    // OWLViewerWidget viewer(secondWindow);
-    // secondWindow.setWindowFlags(Qt::Window | Qt::FramelessWindowHint); 
     secondWindow.show();
   
     return app.exec();
   }
-  // https://code.qt.io/cgit/qt/qtbase.git/tree/examples/opengl/textures/glwidget.cpp?h=5.15
 
 }
 

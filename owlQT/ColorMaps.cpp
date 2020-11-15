@@ -228,6 +228,23 @@ namespace owlQT {
     return knownMaps[mapID % knownMaps.size()].first;
   }
 
+
+    /*! returns re-sampled version of this same map, with numSamples
+        samples */
+  ColorMap ColorMap::resampledTo(int numSamples) const
+  {
+    ColorMap result;
+    for (int i=0;i<numSamples;i++) {
+      float t = i / float(numSamples-1.f);
+      int i0 = min(int(t*(size()-1)),int(size()-1));
+      int i1 = min(i0+1,int(size()-1));
+      float f = t*(size()-1) - i0;
+      result.push_back((1.f-f)*(*this)[i0] + f*(*this)[i1]);
+    }
+    return result;
+  }
+  
+  
   ColorMapLibrary::ColorMapLibrary()
   {
     loadDefaults();
@@ -258,6 +275,9 @@ namespace owlQT {
     ADDCM(hsv);
     
 #undef ADDCM
+
+    for (auto &map : knownMaps)
+      map.second = map.second.resampledTo(numSamplesPerMap);
   }
 
 }

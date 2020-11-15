@@ -33,9 +33,12 @@ namespace owlQT {
   {
     static ColorMap fromPNG(const uint8_t asPNG[],
                             size_t numBytes);
+    
+    /*! returns re-sampled version of this same map, with numSamples
+        samples */
+    ColorMap resampledTo(int numSamples) const;
   };
 
-  ColorMap resample(const ColorMap &cm, int numSamples);
 
 
   

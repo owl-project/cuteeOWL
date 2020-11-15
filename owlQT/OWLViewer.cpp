@@ -277,57 +277,10 @@ namespace owlQT {
     QWidget::keyPressEvent(event);
   }
 
-  
-  // void OWLViewer::resizeEvent(QResizeEvent* event)
-  // {
-  //   PING;
-  //   GlWidget::resizeEvent(event);
-  // }
-  
   void OWLViewer::resizeGL(int width, int height)
   {
-    PING;
-    PRINT(width);
-    PRINT(height);
     resize({width,height});
-    // int side = qMin(width, height);
-    // glViewport((width - side) / 2, (height - side) / 2, side, side);
   }
-
-  // void OWLViewer::makeObject()
-  // {
-  //   printf("makeObject\n");
-  // static const int coords[6][4][3] = {
-  //     { { +1, -1, -1 }, { -1, -1, -1 }, { -1, +1, -1 }, { +1, +1, -1 } },
-  //     { { +1, +1, -1 }, { -1, +1, -1 }, { -1, +1, +1 }, { +1, +1, +1 } },
-  //     { { +1, -1, +1 }, { +1, -1, -1 }, { +1, +1, -1 }, { +1, +1, +1 } },
-  //     { { -1, -1, -1 }, { -1, -1, +1 }, { -1, +1, +1 }, { -1, +1, -1 } },
-  //     { { +1, -1, +1 }, { -1, -1, +1 }, { -1, -1, -1 }, { +1, -1, -1 } },
-  //     { { -1, -1, +1 }, { +1, -1, +1 }, { +1, +1, +1 }, { -1, +1, +1 } }
-  // };
-
-  // for (int j = 0; j < 6; ++j)
-  //     textures[j] = new QOpenGLTexture(QImage(QString(":/images/side%1.png").arg(j + 1)).mirrored());
-
-  // QVector<GLfloat> vertData;
-  // for (int i = 0; i < 6; ++i) {
-  //     for (int j = 0; j < 4; ++j) {
-  //         // vertex position
-  //         vertData.append(0.2 * coords[i][j][0]);
-  //         vertData.append(0.2 * coords[i][j][1]);
-  //         vertData.append(0.2 * coords[i][j][2]);
-  //         // texture coordinate
-  //         vertData.append(j == 0 || j == 3);
-  //         vertData.append(j == 0 || j == 1);
-  //     }
-  // }
-
-  // vbo.create();
-  // vbo.bind();
-  // vbo.allocate(vertData.constData(), vertData.count() * sizeof(GLfloat));
-  // }
-
-
 
 
   /*! helper function that dumps the current frame buffer in a png
@@ -351,18 +304,6 @@ namespace owlQT {
       
   vec2i OWLViewer::getScreenSize()
   {
-    // initGLFW();
-    // int numModes = 0;
-    // auto monitor = glfwGetPrimaryMonitor();
-    // if (!monitor) 
-    //   throw std::runtime_error("could not query monitor...");
-    // const GLFWvidmode *modes
-    //   = glfwGetVideoModes(monitor, &numModes);
-    // vec2i size(0,0);
-    // for (int i=0; i<numModes; i++) 
-    //   size = max(size,vec2i(modes[i].width,modes[i].height));
-    // return size;
-
     QRect rec = QApplication::desktop()->screenGeometry();
     int height = rec.height();
     int width = rec.width();
@@ -463,17 +404,6 @@ namespace owlQT {
     } else {
       resourceSharingSuccessful = true;
     }
-    // }
-    // if (cuDisplayTexture != 0) {
-    //   cudaGraphicsUnmapResources(1, &cuDisplayTexture);
-    //   /* drop last error: */cudaGetLastError();
-    //   cuDisplayTexture = 0;
-    // }
-    // } else {
-    // if (resourceSharingSuccessful)
-    //   cudaGraphicsUnmapResources(1, &cuDisplayTexture);
-    //   resourceSharingSuccessful = true;
-    // }
   }
 
     
@@ -482,7 +412,6 @@ namespace owlQT {
     is */
   void OWLViewer::draw()
   {
-    // glfwMakeContextCurrent(handle);
     if (resourceSharingSuccessful) {
       GL_CHECK(cudaGraphicsMapResources(1, &cuDisplayTexture));
         
@@ -687,20 +616,6 @@ namespace owlQT {
   void OWLViewer::mouseMoveEvent(QMouseEvent *event)
   {
     mouseMotion({event->x(),event->y()});
-    // if (event->button()) {
-    //   PING;
-    //   PRINT(event->button());
-    // };
-    // int dx = event->x() - lastPos.x();
-    // int dy = event->y() - lastPos.y();
-
-    // printf("mouse %i %i\n",dx,dy);
-    // // if (event->buttons() & Qt::LeftButton) {
-    // //     rotateBy(8 * dy, 8 * dx, 0);
-    // // } else if (event->buttons() & Qt::RightButton) {
-    // //     rotateBy(8 * dy, 0, 8 * dx);
-    // // }
-    // lastPos = event->pos();
   }
 
   void OWLViewer::mouseReleaseEvent(QMouseEvent *event)
