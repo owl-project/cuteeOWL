@@ -43,18 +43,28 @@ namespace owlQT {
       maps that are embedded in this library */
   struct ColorMapLibrary
   {
+    ColorMapLibrary();
+    
     /*! return a color map library of hardcoded, embedded color
       maps */
-    static ColorMapLibrary loadDefaults();
+    void loadDefaults(int numSamplesPerMap=128);
     
     /*! returns a std::vector with all the names of color maps known
       in this library */
-    std::vector<std::string> names() const;
+    std::vector<std::string> getNames() const;
 
     /*! find colro map with given name, and reutrn pointer to it; or
         null if this does not exist */
     const ColorMap *find(const std::string &name) const;
 
+    /*! return map with given index */
+    const ColorMap &getMap(const int mapID) const;
+    
+    /*! return _name_ of map with given index */
+    const std::string &getMapName(const int mapID) const;
+
+  private:
+    
     /*! list of color maps stored in this library */
     std::vector<std::pair<std::string,ColorMap>> knownMaps;
   };

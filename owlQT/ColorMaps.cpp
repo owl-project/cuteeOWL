@@ -15,10 +15,12 @@
 // ======================================================================== //
 
 #include "ColorMaps.h"
+
+#define STB_IMAGE_IMPLEMENTATION 1
 #include "samples/common/3rdParty/stb/stb_image.h"
 
 // namesapce owlQT {
- // // #define STB_IMAGE_IMPLEMENTATION 1
+// // #define STB_IMAGE_IMPLEMENTATION 1
 // }
 
 namespace owlQT {
@@ -180,7 +182,7 @@ namespace owlQT {
                              size_t numBytes)
   {
     int w, h, n;
-    uint8_t *img_data = stbi_load_from_memory(asPNG, numBytes, &w, &h, &n, 3);
+    uint8_t *img_data = stbi_load_from_memory(asPNG, numBytes, &w, &h, &n, 4);
 
     if (n != 3 && n != 4)
       throw std::runtime_error("ColorMap::fromPNG: only supporting "
@@ -189,25 +191,53 @@ namespace owlQT {
     values_.reserve(w);
     for (std::size_t i = 0; i < w; ++i) {
       vec4f v;
-      v.x = img_data[i * n + 0] / 255.f;
-      v.y = img_data[i * n + 1] / 255.f;
-      v.z = img_data[i * n + 2] / 255.f;
+      v.x = img_data[i * 4 + 0] / 255.f;
+      v.y = img_data[i * 4 + 1] / 255.f;
+      v.z = img_data[i * 4 + 2] / 255.f;
       v.w
-        = n == 3
+        = (n == 3)
         ? 1.f
-        : img_data[i * n + 3] / 255.f;
+        : img_data[i * 4 + 3] / 255.f;
+      v.w = 1.f;
       values_.push_back(v);
     }
 
     stbi_image_free(img_data);
     return values_;
   }
-  
-  ColorMapLibrary ColorMapLibrary::loadDefaults()
+
+  /*! returns a std::vector with all the names of color maps known
+    in this library */
+  std::vector<std::string> ColorMapLibrary::getNames() const
   {
-    ColorMapLibrary result;
+    std::vector<std::string> result;
+    for (auto cm : knownMaps) result.push_back(cm.first);
+    return result;
+  }
+  
+  
+  /*! return map with given index */
+  const ColorMap &ColorMapLibrary::getMap(const int mapID) const
+  {
+    return knownMaps[mapID % knownMaps.size()].second;
+  }
+    
+  /*! return _name_ of map with given index */
+  const std::string &ColorMapLibrary::getMapName(const int mapID) const
+  {
+    return knownMaps[mapID % knownMaps.size()].first;
+  }
+
+  ColorMapLibrary::ColorMapLibrary()
+  {
+    loadDefaults();
+  }
+  
+  void ColorMapLibrary::loadDefaults(int numSamplesPerMap)
+  {
+    // ColorMapLibrary result;
 #define ADDCM(name)                                                     \
-    result.knownMaps.push_back({std::string(#name),                     \
+    knownMaps.push_back({std::string(#name),                     \
                                 ColorMap::fromPNG(name,sizeof(name))})    
 
     ADDCM(paraview_cool_warm);
@@ -228,7 +258,6 @@ namespace owlQT {
     ADDCM(hsv);
     
 #undef ADDCM
-    return result;
   }
 
 }

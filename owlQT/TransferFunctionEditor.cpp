@@ -38,6 +38,14 @@ namespace owlQT {
   
   AlphaEditor::~AlphaEditor()
   {}
+
+  void AlphaEditor::setColorMap(const ColorMap &cm)
+  {
+    xf = cm;
+    
+    emit colorMapChanged();
+    update();
+  }
   
   QSize AlphaEditor::minimumSizeHint() const
   {

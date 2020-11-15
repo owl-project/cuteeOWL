@@ -20,6 +20,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QFormLayout>
+#include "QComboBox"
 // BorderLayout Sample
 
 #include "owlQT/OWLViewer.h"
@@ -76,13 +77,19 @@ namespace owlQT {
 
 
     AlphaEditor *ae = new AlphaEditor;
-
+    ColorMapLibrary colorMaps;
+    ae->setColorMap(colorMaps.getMap(0));
 
     QFormLayout *layout = new QFormLayout;
-    
+
+    QComboBox *cmSelector = new QComboBox;
+    for (auto cmName : colorMaps.getNames())
+      cmSelector->addItem(QString(cmName.c_str()));
+         
     layout->addWidget(new QLabel("Hello World from QT Label"));
     layout->addWidget(new QPushButton("Button Test"));
     layout->addWidget(ae);
+    layout->addWidget(cmSelector);
 
     // QVBoxLayout *topLayout = new QVBoxLayout;
     // topLayout->addWidget(new QLabel("Hello World from QT Label"));

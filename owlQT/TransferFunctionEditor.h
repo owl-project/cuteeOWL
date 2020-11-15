@@ -52,9 +52,16 @@ namespace owlQT {
     AlphaEditor();
     ~AlphaEditor();
 
+    
+    void setColorMap(const ColorMap &cm);
+
+
+    // ------------------------------------------------------------------
+    // qt stuff
+    // ------------------------------------------------------------------
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
-
+    
   signals:
     void colorMapChanged();
     // void clicked();
