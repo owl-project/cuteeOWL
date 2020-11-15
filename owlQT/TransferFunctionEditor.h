@@ -35,6 +35,8 @@ namespace owlQT {
   using namespace owl;
   using namespace owl::common;
 
+  struct XFEditor;
+  
   typedef interval<float> range1f;
   
   /*! a widget that displays - and allows to draw into the alpha
@@ -54,6 +56,8 @@ namespace owlQT {
   {
     Q_OBJECT
 
+    friend class XFEditor;
+    
   public:
     using QOpenGLWidget::QOpenGLWidget;
 
@@ -72,7 +76,7 @@ namespace owlQT {
     QSize sizeHint() const override;
     
   signals:
-    void colorMapChanged();
+    void colorMapChanged(const AlphaEditor *);
     // void clicked();
 
   protected:
@@ -159,8 +163,16 @@ namespace owlQT {
       // connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
       connect(cmSelector, SIGNAL(currentIndexChanged(int)),
               this, SLOT(cmSelectionChanged(int)));
+      connect(alphaEditor, SIGNAL(colorMapChanged(const AlphaEditor*)),
+              this, SLOT(alphaEditorChanged(const AlphaEditor*)));
     }
-
+    
+    /*! this is a virtual method that an app can subclass to intercept
+        a changed - the 'proper' way is to use a signal to another qt
+        app, but if the main app isn't a qt object this'll give 'some'
+        way of creating the same effect */
+    virtual void colorMapChangedCB(const std::vector<vec4f> *xf)
+    { /* can be subclassed - main class does nothing */ }
   public slots:
     /*! we'll have the qcombobox that selsects the desired color map
       call this, and then update the alpha editor */
@@ -168,13 +180,18 @@ namespace owlQT {
     {
       alphaEditor->setColorMap(colorMaps.getMap(idx),AlphaEditor::KEEP_ALPHA);
     }
+    void alphaEditorChanged(const AlphaEditor *ae)
+    {
+      PING;
+      colorMapChangedCB(&ae->xf);
+    }
     
-  signals:
-    /*! this gets emitted every time the app 'might' want to check
-        that the color map got changed (either by drawing into, or by
-        selecting a new color map */
-    void colorMapChanged();
-
+  // signals:
+  //   /*! this gets emitted every time the app 'might' want to check
+  //       that the color map got changed (either by drawing into, or by
+  //       selecting a new color map */
+  //   void colorMapChanged(const std::vector<vec4f> *);
+    
   private:
     AlphaEditor *alphaEditor;
     QFormLayout *layout;

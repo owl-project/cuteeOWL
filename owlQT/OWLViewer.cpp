@@ -160,6 +160,13 @@ namespace owlQT {
   //     update();
   // }
 
+
+  void OWLViewer::setTitle(const std::string &s)
+  {
+    setWindowTitle(s.c_str());
+    // std::cout << "owlQT::OWLViewer::setTitle not yet implemented ... ignoring" << std::endl;
+  }
+
   void OWLViewer::initializeGL()
   {
     initializeOpenGLFunctions();
@@ -674,4 +681,15 @@ namespace owlQT {
     emit clicked();
   }
 
+  /*! set a new orientation for the camera, update the camera, and
+    notify the app */
+  void OWLViewer::setCameraOrientation(/* camera origin    : */const vec3f &origin,
+                                       /* point of interest: */const vec3f &interest,
+                                       /* up-vector        : */const vec3f &up,
+                                       /* fovy, in degrees : */float fovyInDegrees)
+  {
+    camera.setOrientation(origin,interest,up,fovyInDegrees,false);
+    updateCamera();
+  }
+  
 }

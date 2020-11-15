@@ -54,7 +54,7 @@ namespace owlQT {
       xf = cm;
     }
     
-    emit colorMapChanged();
+    emit colorMapChanged(this);
     update();
   }
   
@@ -242,7 +242,7 @@ namespace owlQT {
                   (parent_rel_to-offset)*rcp(scale),
                   set);
 
-    emit colorMapChanged();
+    emit colorMapChanged(this);
     update();
   }
 

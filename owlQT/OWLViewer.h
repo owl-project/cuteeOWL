@@ -16,6 +16,8 @@
 
 #include "owlQT/Camera.h"
 
+#include <QApplication>
+#include <QMainWindow>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
