@@ -19,8 +19,11 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QFormLayout>
+// BorderLayout Sample
 
 #include "owlQT/OWLViewer.h"
+#include "owlQT/TransferFunctionEditor.h"
 
 namespace owlQT {
   struct SampleViewer : public owlQT::OWLViewer{
@@ -71,9 +74,25 @@ namespace owlQT {
     // QPushButton button("Hello World!");
     // button.show();
 
-    QVBoxLayout *layout = new QVBoxLayout;
+
+    AlphaEditor *ae = new AlphaEditor;
+
+
+    QFormLayout *layout = new QFormLayout;
+    
     layout->addWidget(new QLabel("Hello World from QT Label"));
     layout->addWidget(new QPushButton("Button Test"));
+    layout->addWidget(ae);
+
+    // QVBoxLayout *topLayout = new QVBoxLayout;
+    // topLayout->addWidget(new QLabel("Hello World from QT Label"));
+    // topLayout->addWidget(new QPushButton("Button Test"));
+    // // topLayout->setSizeConstraint(QLayout::SetFixedSize);
+
+    
+    // BorderLayout *borderLayout = new BorderLayout;
+    // borderLayout->addLayout(layout,BorderLayout::North);
+    // borderLayout->addWidget(ae,BorderLayout::Center);
     
     QWidget *window = new QWidget();
     window->setLayout(layout);

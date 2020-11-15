@@ -14,7 +14,7 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "OWLViewer.h"
+#include "TransferFunctionEditor.h"
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QMouseEvent>
@@ -23,190 +23,235 @@
 #include <QDesktopWidget>
 
 namespace owlQT {
-  OWLViewer::~OWLViewer()
+
+  AlphaEditor::AlphaEditor()
   {
+    const int N = 128;
+    
+    const vec4f xf0(0.f,0.f,1.f,0.f);
+    const vec4f xf1(1.f,0.f,0.f,1.f);;
+    for (int i=0;i<N;i++) {
+      float f = i / (N-1.f);
+      xf.push_back((1.f-f)*xf0+f*xf1);
+    }
+  }
   
-    makeCurrent();
-    // vbo.destroy();
-    // for (int i = 0; i < 6; ++i)
-    //     delete textures[i];
-    // delete program;
-    doneCurrent();
-  }
-
-    /*! snaps a given vector to one of the three coordinate axis;
-      useful for pbrt models in which the upvector sometimes isn't
-      axis-aligend */
-  vec3f OWLViewer::getUpVector(const vec3f &v)
+  AlphaEditor::~AlphaEditor()
+  {}
+  
+  QSize AlphaEditor::minimumSizeHint() const
   {
-    int dim = arg_max(abs(v));
-    vec3f up(0);
-    up[dim] = v[dim] < 0.f ? -1.f : 1.f;
-    return up;
+    return QSize(250, 150);
   }
-
-  QSize OWLViewer::minimumSizeHint() const
-  {
-    return QSize(50, 50);
-  }
-
-  QSize OWLViewer::sizeHint() const
+  
+  QSize AlphaEditor::sizeHint() const
   {
     QRect rec = QApplication::desktop()->screenGeometry();
     int height = rec.height();
     int width = rec.width();
-    return QSize(width/2, height/2);
-    // return QSize(200, 200);
+    return QSize(width/6, height/6);
   }
 
-  // void OWLViewer::rotateBy(int xAngle, int yAngle, int zAngle)
-  // {
-  //     xRot += xAngle;
-  //     yRot += yAngle;
-  //     zRot += zAngle;
-  //     update();
-  // }
-
-  // void OWLViewer::setClearColor(const QColor &color)
-  // {
-  //     clearColor = color;
-  //     update();
-  // }
-
-  void OWLViewer::initializeGL()
+  void AlphaEditor::initializeGL()
   {
     initializeOpenGLFunctions();
     glDisable(GL_DEPTH_TEST);
-
-    // makeObject();
-
-    //     glEnable(GL_DEPTH_TEST);
-    //     glEnable(GL_CULL_FACE);
-
-    // #define PROGRAM_VERTEX_ATTRIBUTE 0
-    // #define PROGRAM_TEXCOORD_ATTRIBUTE 1
-
-    //     QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
-    //     const char *vsrc =
-    //         "attribute highp vec4 vertex;\n"
-    //         "attribute mediump vec4 texCoord;\n"
-    //         "varying mediump vec4 texc;\n"
-    //         "uniform mediump mat4 matrix;\n"
-    //         "void main(void)\n"
-    //         "{\n"
-    //         "    gl_Position = matrix * vertex;\n"
-    //         "    texc = texCoord;\n"
-    //         "}\n";
-    //     vshader->compileSourceCode(vsrc);
-
-    //     QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
-    //     const char *fsrc =
-    //         "uniform sampler2D texture;\n"
-    //         "varying mediump vec4 texc;\n"
-    //         "void main(void)\n"
-    //         "{\n"
-    //         "    gl_FragColor = texture2D(texture, texc.st);\n"
-    //         "}\n";
-    //     fshader->compileSourceCode(fsrc);
-
-    //     program = new QOpenGLShaderProgram;
-    //     program->addShader(vshader);
-    //     program->addShader(fshader);
-    //     program->bindAttributeLocation("vertex", PROGRAM_VERTEX_ATTRIBUTE);
-    //     program->bindAttributeLocation("texCoord", PROGRAM_TEXCOORD_ATTRIBUTE);
-    //     program->link();
-
-    //     program->bind();
-    //     program->setUniformValue("texture", 0);
   }
 
-  void OWLViewer::paintGL()
+  void AlphaEditor::paintGL()
   {
-    static float clearColor = 0.f;
-    // glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
-    clearColor = fmodf(clearColor+.01f,1.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(clearColor,clearColor,clearColor,1.f);
-    printf("bla\n");
-    // QMatrix4x4 m;
-    // m.ortho(-0.5f, +0.5f, +0.5f, -0.5f, 4.0f, 15.0f);
-    // m.translate(0.0f, 0.0f, -10.0f);
-    // m.rotate(xRot / 16.0f, 1.0f, 0.0f, 0.0f);
-    // m.rotate(yRot / 16.0f, 0.0f, 1.0f, 0.0f);
-    // m.rotate(zRot / 16.0f, 0.0f, 0.0f, 1.0f);
+    // makeCurrent();
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
 
-    // program->setUniformValue("matrix", m);
-    // program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
-    // program->enableAttributeArray(PROGRAM_TEXCOORD_ATTRIBUTE);
-    // program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 5 * sizeof(GLfloat));
-    // program->setAttributeBuffer(PROGRAM_TEXCOORD_ATTRIBUTE, GL_FLOAT, 3 * sizeof(GLfloat), 2, 5 * sizeof(GLfloat));
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.f, width, 0.f, height, -1000.f, 1000.f);
+    glViewport(0.f, 0.f, width, height);
+      
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glScalef(width,height,1.f);
 
-    // for (int i = 0; i < 6; ++i) {
-    //     textures[i]->bind();
-    //     glDrawArrays(GL_TRIANGLE_FAN, i * 4, 4);
-    // }
+    // ------------------------------------------------------------------
+    // paint background using window palette
+    // ------------------------------------------------------------------
+    QPalette palette
+      = QApplication::palette();
+    QColor bgColor
+      = palette.color(QPalette::Active,QPalette::Window);
+    
+    glClearColor(bgColor.redF(),
+                 bgColor.greenF(),
+                 bgColor.blueF(),
+                 bgColor.alphaF());
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    const int alphaCount = xf.size();
+
+    // ------------------------------------------------------------------
+    // draw the alpha map
+    // ------------------------------------------------------------------
+    glPushMatrix();
+    {
+      glTranslatef(0.f,histogramHeight,1.f);
+      glScalef(1.f,1.f-histogramHeight,1.f);
+      for (int i=0;i<alphaCount-1;i++) {
+        int i0 = i;
+        int i1 = i+1;
+
+        const vec4f c0 = xf[i0];
+        const vec4f c1 = xf[i1];
+        float x0 = i0 / float(alphaCount-1.f);
+        float x1 = i1 / float(alphaCount-1.f);
+        glBegin( GL_QUADS );
+        {
+          glColor4f(c0.x,c0.y,c0.z,1.f);
+          glVertex2f( x0,0.f );
+          glVertex2f( x0,c0.w );
+        
+          glColor4f(c1.x,c1.y,c1.z,1.f);
+          glVertex2f( x1,c1.w );
+          glVertex2f( x1,0.f );
+        }
+        glEnd();
+      }
+    }
+    glPopMatrix();
+
+
+    // ------------------------------------------------------------------
+    // draw the histogram
+    // ------------------------------------------------------------------
+    if (!histogram.empty()) {
+      glColor4f(1.f-bgColor.redF(),
+                1.f-bgColor.greenF(),
+                1.f-bgColor.blueF(),
+                1.f);
+      float maxHistogramValue = 0.f;
+      for (auto v : histogram)
+        maxHistogramValue = std::max(maxHistogramValue,v);
+      glPushMatrix();
+      {
+        glTranslatef(0.f,histogramHeight,1.f);
+        glScalef(1.f,1.f-histogramHeight,1.f);
+        for (int i=0;i<histogram.size();i++) {
+          float x0 = (i+0) / float(histogram.size());
+          float x1 = (i+1) / float(histogram.size());
+          float height = histogram[i]/maxHistogramValue;
+          
+          glVertex2f( x0,0.f );
+          glVertex2f( x0,height );
+          
+          glVertex2f( x1,height );
+          glVertex2f( x1,0.f );
+        }
+      }
+      glPopMatrix();
+    }
+    // doneCurrent();
   }
 
-  void OWLViewer::resizeGL(int width, int height)
+
+
+
+  
+  /*! draw with the mouse into the alpha window, using relative
+    coordinates (0,0 lower lef, 1,1 upper right) */
+  void AlphaEditor::drawIntoAlpha(vec2f from,
+                                  vec2f to,
+                                  bool set)
   {
-    int side = qMin(width, height);
-    glViewport((width - side) / 2, (height - side) / 2, side, side);
+    if (from.x > to.x) std::swap(from,to);
+
+    int x0 = int(floorf(from.x * (xf.size()-1) + .5f));
+    int x1 = int(floorf(to.x * (xf.size()-1) + .5f));
+    for (int x=x0;x<=x1;x++) {
+      float f = (x0==x1)?1.f:((x-x0)/float(x1-x0));
+      float y = (1.f-f)*from.y+f*to.y;
+      if (x>=0 && x<xf.size())
+        if (set)
+          xf[x].w = min(1.f,max(0.f,y));
+        else
+          xf[x].w = y > .65f ? 1.f : 0.f;
+    }
   }
 
-  void OWLViewer::mousePressEvent(QMouseEvent *event)
+  /*! draw with the mouse into the alpha window, using absolute
+    parent window coordinates */
+  void AlphaEditor::drawIntoAlphaAbsolute(const vec2i &from,
+                                          const vec2i &to,
+                                          bool set)
   {
-    lastPos = event->pos();
+    vec2i parentSize = { width, height };//getWindowSize();
+    vec2f parent_rel_from = (vec2f)from * rcp(vec2f(parentSize));
+    vec2f parent_rel_to   = (vec2f)to * rcp(vec2f(parentSize));
+
+    // invert mouse pos to start at lower left, not top left
+    parent_rel_from.y = 1.f-parent_rel_from.y;
+    parent_rel_to.y = 1.f-parent_rel_to.y;
+
+    vec2f scale(1.f, 1.f-histogramHeight);
+    vec2f offset(0.f,histogramHeight);
+
+    drawIntoAlpha((parent_rel_from-offset)*rcp(scale),
+                  (parent_rel_to-offset)*rcp(scale),
+                  set);
+
+    emit colorMapChanged();
+    update();
   }
 
-  void OWLViewer::mouseMoveEvent(QMouseEvent *event)
+  /*! draw from last pixel where we ended drawing to new mouse
+    position */
+  void AlphaEditor::drawLastToCurrent(vec2i newPos)
   {
-    int dx = event->x() - lastPos.x();
-    int dy = event->y() - lastPos.y();
-
-    printf("mouse %i %i\n",dx,dy);
-    // if (event->buttons() & Qt::LeftButton) {
-    //     rotateBy(8 * dy, 8 * dx, 0);
-    // } else if (event->buttons() & Qt::RightButton) {
-    //     rotateBy(8 * dy, 0, 8 * dx);
-    // }
-    lastPos = event->pos();
+    // lastPos = newPos;
+    if (leftButtonPressed)
+      drawIntoAlphaAbsolute(lastPos,newPos,true);
+    else if (rightButtonPressed)
+      drawIntoAlphaAbsolute(lastPos,newPos,false);
+    lastPos = newPos;
   }
+  
 
-  void OWLViewer::mouseReleaseEvent(QMouseEvent * /* event */)
+
+  
+  void AlphaEditor::resizeGL(int width, int height)
   {
-    emit clicked();
+    this->width = width;
+    this->height = height;
   }
 
-  // void OWLViewer::makeObject()
-  // {
-  //   printf("makeObject\n");
-  // static const int coords[6][4][3] = {
-  //     { { +1, -1, -1 }, { -1, -1, -1 }, { -1, +1, -1 }, { +1, +1, -1 } },
-  //     { { +1, +1, -1 }, { -1, +1, -1 }, { -1, +1, +1 }, { +1, +1, +1 } },
-  //     { { +1, -1, +1 }, { +1, -1, -1 }, { +1, +1, -1 }, { +1, +1, +1 } },
-  //     { { -1, -1, -1 }, { -1, -1, +1 }, { -1, +1, +1 }, { -1, +1, -1 } },
-  //     { { +1, -1, +1 }, { -1, -1, +1 }, { -1, -1, -1 }, { +1, -1, -1 } },
-  //     { { -1, -1, +1 }, { +1, -1, +1 }, { +1, +1, +1 }, { -1, +1, +1 } }
-  // };
+  void AlphaEditor::mousePressEvent(QMouseEvent *event)
+  {
+    if (event->button() == Qt::LeftButton)
+      leftButtonPressed = true;
+    if (event->button() == Qt::RightButton)
+      rightButtonPressed = true;
 
-  // for (int j = 0; j < 6; ++j)
-  //     textures[j] = new QOpenGLTexture(QImage(QString(":/images/side%1.png").arg(j + 1)).mirrored());
+    lastPos = { event->pos().x(), event->pos().y() };
+    drawLastToCurrent(lastPos); // yes, draw "last to last" (single click) ...
+  }
 
-  // QVector<GLfloat> vertData;
-  // for (int i = 0; i < 6; ++i) {
-  //     for (int j = 0; j < 4; ++j) {
-  //         // vertex position
-  //         vertData.append(0.2 * coords[i][j][0]);
-  //         vertData.append(0.2 * coords[i][j][1]);
-  //         vertData.append(0.2 * coords[i][j][2]);
-  //         // texture coordinate
-  //         vertData.append(j == 0 || j == 3);
-  //         vertData.append(j == 0 || j == 1);
-  //     }
-  // }
+  void AlphaEditor::mouseReleaseEvent(QMouseEvent *event)
+  {
+    if (event->button() == Qt::LeftButton)
+      leftButtonPressed = false;
+    if (event->button() == Qt::RightButton)
+      rightButtonPressed = false;
+    
+    lastPos = { event->pos().x(), event->pos().y() };
+    drawLastToCurrent(lastPos); // yes, draw "last to last" (single click) ...
+    
+    // emit clicked();
+  }
 
-  // vbo.create();
-  // vbo.bind();
-  // vbo.allocate(vertData.constData(), vertData.count() * sizeof(GLfloat));
-  // }
+  void AlphaEditor::mouseMoveEvent(QMouseEvent *event)
+  {
+    vec2i newPos{event->pos().x(),event->pos().y()};
+    
+    drawLastToCurrent(newPos); 
+  }
+
 }

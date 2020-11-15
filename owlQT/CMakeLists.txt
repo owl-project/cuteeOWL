@@ -28,6 +28,10 @@ add_library(owlQT STATIC
   InspectMode.cpp
   FlyMode.cpp
   Camera.cpp
+  TransferFunctionEditor.cpp
+
+  ColorMaps.h
+  ColorMaps.cpp
   )
 target_link_libraries(owlQT
   ${OPENGL_opengl_LIBRARY}

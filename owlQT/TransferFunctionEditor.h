@@ -14,6 +14,8 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
+#include "ColorMaps.h"
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
@@ -24,77 +26,38 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
 
 namespace owlQT {
 
-  /*! base abstraction for a camera that can generate rays. For this
-    viewer, we assume we're dealine with a camera that has a
-    rectangular viewing plane that's in focus, and a circular (and
-    possible single-point) lens for depth of field. At some later
-    point this should also capture time.{t0,t1} for motion blur, but
-    let's leave this out for now. */
-  struct SimpleCamera
-  {
-    inline SimpleCamera() {}
-    SimpleCamera(const Camera &camera);
+  using namespace owl;
+  using namespace owl::common;
 
-    struct {
-      vec3f lower_left;
-      vec3f horizontal;
-      vec3f vertical;
-    } screen;
-    struct {
-      vec3f center;
-      vec3f du;
-      vec3f dv;
-      float radius { 0.f };
-    } lens;
-  };
+  /*! a widget that displays - and allows to draw into the alpha
+      channel of - a "color+alpha" transfer function. The widget
+      consists of two halves - the upper 80% displays the current
+      transfer function using a graph (with color in x from the color
+      channels, and height in y from the alpha channel); the lower 20%
+      can optionally display a histogram of corresponding values. 
     
-  /*! snaps a given vector to one of the three coordinate axis;
-    useful for pbrt models in which the upvector sometimes isn't
-    axis-aligend */
-  inline vec3f getUpVector(const vec3f &v)
-  {
-    int dim = arg_max(abs(v));
-    vec3f up(0);
-    up[dim] = v[dim] < 0.f ? -1.f : 1.f;
-    return up;
-  }
-
-  class OWLViewer : public QOpenGLWidget, protected QOpenGLFunctions
+      Editing the alpha channel works by drawing with the mouse into
+      it, using either left or right mouse button: left button sets
+      alpha value at given cursor pos to where teh curor is in the
+      window; right button sets alpha at that x positoin to either 0.f
+      (if in lower two-thirds of widget), or 1.f (if in upper third).
+  */
+  class AlphaEditor : public QOpenGLWidget, protected QOpenGLFunctions
   {
     Q_OBJECT
 
   public:
     using QOpenGLWidget::QOpenGLWidget;
 
-    OWLViewer() {
-      printf("creating timer...\n");
-      connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
-      timer.start(1);
-    }
-  
-    ~OWLViewer();
+    AlphaEditor();
+    ~AlphaEditor();
 
-    // ------------------------------------------------------------------
-    // VIEWER LOGIC
-    // ------------------------------------------------------------------
-    
-    /*! snaps a given vector to one of the three coordinate axis;
-      useful for pbrt models in which the upvector sometimes isn't
-      axis-aligend */
-    static vec3f getUpVector(const vec3f &v);
-
-
-    // ------------------------------------------------------------------
-    // QT STUFF
-    // ------------------------------------------------------------------
-    
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
-    // void rotateBy(int xAngle, int yAngle, int zAngle);
-    // void setClearColor(const QColor &color);
 
   signals:
-    void clicked();
+    void colorMapChanged();
+    // void clicked();
 
   protected:
     void initializeGL() override;
@@ -105,16 +68,36 @@ namespace owlQT {
     void mouseReleaseEvent(QMouseEvent *event) override;
 
   private:
-    // void makeObject();
+    void drawLastToCurrent(vec2i to);
+    void drawIntoAlpha(vec2f from,
+                       vec2f to,
+                       bool set);
+    void drawIntoAlphaAbsolute(const vec2i &from,
+                               const vec2i &to,
+                               bool set);
 
-    QColor clearColor = Qt::black;
-    QPoint lastPos;
-    // int xRot = 0;
-    // int yRot = 0;
-    // int zRot = 0;
-    // QOpenGLTexture *textures[6] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
-    // QOpenGLShaderProgram *program = nullptr;
-    QOpenGLBuffer vbo;
-    QTimer timer;
+      
+    std::vector<vec4f> xf;
+    // QColor clearColor = Qt::black;
+    // QPoint lastPos;
+    int width, height;
+    bool leftButtonPressed = 0;
+    bool rightButtonPressed = 0;
+    vec2i lastPos;
+
+    /*! height of histogram area, relative to total widget height */
+    const float histogramHeight = .2f;
+    
+    /*! histogram of scalar values corresponding to the scalar range
+        for which we draw the transfer function. histogram values are
+        absolute (we will normalize in drawing); histogram may be
+        empty, in which case it gets ignored. histogram does not have
+        to have same x resolution as transfer functoin */
+    std::vector<float> histogram;
   };
+
+
+  // struct XFEditor : public QWidget {
+  // };
+  
 }
