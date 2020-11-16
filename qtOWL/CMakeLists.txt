@@ -49,7 +49,7 @@ qt5_use_modules(qtOWL
 set(QT_OWL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/.. ${OWL_INCLUDES} PARENT_SCOPE)
 set(QT_OWL_LIBRARIES qtOWL PARENT_SCOPE)
   
-macro(OWL_QT_LINK target)
+macro(QT_OWL_LINK target)
   target_link_libraries(${target} ${QT_OWL_LIBRARIES})
   qt5_use_modules(${target} Widgets)
 endmacro()

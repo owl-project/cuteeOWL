@@ -58,7 +58,7 @@ add_executable(sampleViewer
   apps/sample.cpp
   )
 
-OWL_QT_LINK(sampleViewer)
+QT_OWL_LINK(sampleViewer)
 
 set(QT_OWL_INCLUDES  ${QT_OWL_INCLUDES}  PARENT_SCOPE)
 set(QT_OWL_LIBRARIES ${QT_OWL_LIBRARIES} PARENT_SCOPE)

@@ -51,9 +51,14 @@ namespace qtOWL {
 
   public:
     XFEditor();
+
+    const ColorMap &getColorMap() const;
     
   signals:
-    void changed(const XFEditor *);
+    /*! the color map (in the alpha editor) got changed; either
+        because the user drew in it, or selected anothe ron from the
+        drobox, etc */
+    void colorMapChanged(qtOWL::XFEditor *);
                                      
   public slots:
     /*! we'll have the qcombobox that selsects the desired color map
@@ -62,7 +67,7 @@ namespace qtOWL {
 
     /*! the alpha editor child widget changed something to the color
         map*/
-    void alphaEditorChanged(const AlphaEditor *ae);
+    void alphaEditorChanged(qtOWL::AlphaEditor *ae);
     
   private:
     ColorMapLibrary colorMaps;

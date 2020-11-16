@@ -59,23 +59,29 @@ namespace qtOWL {
     // connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     connect(cmSelector, SIGNAL(currentIndexChanged(int)),
             this, SLOT(cmSelectionChanged(int)));
-    connect(alphaEditor, SIGNAL(colorMapChanged(const AlphaEditor*)),
-            this, SLOT(alphaEditorChanged(const AlphaEditor*)));
+    connect(alphaEditor, SIGNAL(colorMapChanged(qtOWL::AlphaEditor*)),
+            this, SLOT(alphaEditorChanged(qtOWL::AlphaEditor*)));
   }
 
   /*! we'll have the qcombobox that selsects the desired color map
     call this, and then update the alpha editor */
   void XFEditor::cmSelectionChanged(int idx)
   {
-    alphaEditor->setColorMap(colorMaps.getMap(idx),AlphaEditor::KEEP_ALPHA);
+    alphaEditor->setColorMap(colorMaps.getMap(idx),
+                             AlphaEditor::KEEP_ALPHA);
   }
   
   /*! the alpha editor child widget changed something to the color
     map*/
-  void XFEditor::alphaEditorChanged(const AlphaEditor *ae)
+  void XFEditor::alphaEditorChanged(AlphaEditor *ae)
   {
     //colorMapChangedCB(&ae->xf);
-    emit changed(this);
+    emit colorMapChanged(this);
   }
   
+  const ColorMap &XFEditor::getColorMap() const
+  {
+    return alphaEditor->getColorMap();
+  }
+    
 }

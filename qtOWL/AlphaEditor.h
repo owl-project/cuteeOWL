@@ -67,7 +67,9 @@ namespace qtOWL {
     typedef enum { KEEP_ALPHA, OVERWRITE_ALPHA } SetColorMapModeMode;
     
     void setColorMap(const ColorMap &cm, SetColorMapModeMode mode);
-
+    
+    /*! return the current color map */
+    const ColorMap &getColorMap() const { return colorMap; }
 
     // ------------------------------------------------------------------
     // qt stuff
@@ -76,8 +78,7 @@ namespace qtOWL {
     QSize sizeHint() const override;
     
   signals:
-    void colorMapChanged(const AlphaEditor *);
-    // void clicked();
+    void colorMapChanged(qtOWL::AlphaEditor *);
 
   protected:
     void initializeGL() override;
@@ -96,10 +97,9 @@ namespace qtOWL {
                                const vec2i &to,
                                bool set);
 
-      
-    std::vector<vec4f> xf;
-    // QColor clearColor = Qt::black;
-    // QPoint lastPos;
+    /*! the color map we're currently editing */
+    ColorMap colorMap;
+    
     int width, height;
     bool leftButtonPressed = 0;
     bool rightButtonPressed = 0;

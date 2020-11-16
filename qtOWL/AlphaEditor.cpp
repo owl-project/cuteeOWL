@@ -25,24 +25,24 @@
 namespace qtOWL {
 
   AlphaEditor::AlphaEditor(const ColorMap &cm)
-    : xf(cm)
+    : colorMap(cm)
   {}
   
   AlphaEditor::~AlphaEditor()
   {}
 
-  void AlphaEditor::setColorMap(const ColorMap &cm,
+  void AlphaEditor::setColorMap(const ColorMap &newColorMap,
                                 SetColorMapModeMode mode)
   {
     if (mode == AlphaEditor::KEEP_ALPHA) {
-      if (cm.size() != xf.size())
+      if (newColorMap.size() != colorMap.size())
         throw std::runtime_error("invalid attempt to apply color channels "
                                  "from other color map of different size!?");
-      for (int i=0;i<cm.size();i++)
-        xf[i] = vec4f(vec3f(cm[i]),xf[i].w);
+      for (int i=0;i<newColorMap.size();i++)
+        colorMap[i] = vec4f(vec3f(newColorMap[i]),colorMap[i].w);
       
     } else {
-      xf = cm;
+      colorMap = newColorMap;
     }
     
     emit colorMapChanged(this);
@@ -97,7 +97,7 @@ namespace qtOWL {
                  bgColor.alphaF());
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const int alphaCount = xf.size();
+    const int alphaCount = colorMap.size();
 
     // ------------------------------------------------------------------
     // draw the alpha map
@@ -110,8 +110,8 @@ namespace qtOWL {
         int i0 = i;
         int i1 = i+1;
 
-        const vec4f c0 = xf[i0];
-        const vec4f c1 = xf[i1];
+        const vec4f c0 = colorMap[i0];
+        const vec4f c1 = colorMap[i1];
         float x0 = i0 / float(alphaCount-1.f);
         float x1 = i1 / float(alphaCount-1.f);
         glBegin( GL_QUADS );
@@ -199,16 +199,16 @@ namespace qtOWL {
   {
     if (from.x > to.x) std::swap(from,to);
 
-    int x0 = int(floorf(from.x * (xf.size()-1) + .5f));
-    int x1 = int(floorf(to.x * (xf.size()-1) + .5f));
+    int x0 = int(floorf(from.x * (colorMap.size()-1) + .5f));
+    int x1 = int(floorf(to.x * (colorMap.size()-1) + .5f));
     for (int x=x0;x<=x1;x++) {
       float f = (x0==x1)?1.f:((x-x0)/float(x1-x0));
       float y = (1.f-f)*from.y+f*to.y;
-      if (x>=0 && x<xf.size())
+      if (x>=0 && x<colorMap.size())
         if (set)
-          xf[x].w = min(1.f,max(0.f,y));
+          colorMap[x].w = min(1.f,max(0.f,y));
         else
-          xf[x].w = y > .65f ? 1.f : 0.f;
+          colorMap[x].w = y > .65f ? 1.f : 0.f;
     }
   }
 
