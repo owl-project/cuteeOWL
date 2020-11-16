@@ -17,13 +17,9 @@
 if (POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif()
-project(Optix-OWL VERSION 0.0.1)
+project(Cutee-OWL VERSION 0.0.1)
 cmake_minimum_required(VERSION 3.16)
 
-project(OWLQTViewer)
-
-#find_package(Qt4 COMPONENTS QTCORE QTGUI)
-#find_package(
 find_package(Qt5Widgets REQUIRED)
 
 # As moc files are generated in the binary dir, tell CMake
@@ -46,7 +42,7 @@ endif()
 # the owlQT library with viewer widget etc
 # ------------------------------------------------------------------
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-add_subdirectory(owlQT)
+add_subdirectory(qtOWL)
 
 
 # ------------------------------------------------------------------
@@ -56,7 +52,7 @@ add_subdirectory(owlQT)
 # Tell CMake to run moc when necessary:
 set(CMAKE_AUTOMOC ON)
 
-include_directories(${OWL_QT_INCLUDES})
+include_directories(${QT_OWL_INCLUDES})
 
 add_executable(sampleViewer
   apps/sample.cpp
@@ -64,6 +60,6 @@ add_executable(sampleViewer
 
 OWL_QT_LINK(sampleViewer)
 
-set(QT_OWL_INCLUDES ${OWL_QT_INCLUDES} PARENT_SCOPE)
-set(QT_OWL_LIBRARIES ${OWL_QT_LIBRARIES} PARENT_SCOPE)
-message("OWL_QT_LIBRARIES ${OWL_QT_LIBRARIES}")
+set(QT_OWL_INCLUDES  ${QT_OWL_INCLUDES}  PARENT_SCOPE)
+set(QT_OWL_LIBRARIES ${QT_OWL_LIBRARIES} PARENT_SCOPE)
+message("OWL_QT_LIBRARIES ${QT_OWL_LIBRARIES}")

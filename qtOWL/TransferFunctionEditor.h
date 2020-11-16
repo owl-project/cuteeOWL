@@ -30,7 +30,7 @@
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
 
-namespace owlQT {
+namespace qtOWL {
 
   using namespace owl;
   using namespace owl::common;

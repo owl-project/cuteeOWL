@@ -22,20 +22,11 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-namespace owlQT {
+namespace qtOWL {
 
   AlphaEditor::AlphaEditor(const ColorMap &cm)
     : xf(cm)
-  {
-    // const int N = 128;
-    
-    // const vec4f xf0(0.f,0.f,1.f,0.f);
-    // const vec4f xf1(1.f,0.f,0.f,1.f);;
-    // for (int i=0;i<N;i++) {
-    //   float f = i / (N-1.f);
-    //   xf.push_back((1.f-f)*xf0+f*xf1);
-    // }
-  }
+  {}
   
   AlphaEditor::~AlphaEditor()
   {}

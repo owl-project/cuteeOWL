@@ -17,7 +17,7 @@
 #include "Camera.h"
 #include "OWLViewer.h"
 
-namespace owlQT {
+namespace qtOWL {
 
   vec3f Camera::getFrom() const
   {

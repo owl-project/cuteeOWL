@@ -27,7 +27,7 @@
 #include <unistd.h>
 #endif
 
-namespace owlQT {
+namespace qtOWL {
 
   using namespace owl;
   using namespace owl::common;
