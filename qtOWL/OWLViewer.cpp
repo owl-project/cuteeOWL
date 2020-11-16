@@ -30,7 +30,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION 1
 #include "samples/common/3rdParty/stb/stb_image_write.h"
 
-namespace owlQT {
+namespace qtOWL {
 
   inline const char* getGLErrorString( GLenum error )
   {

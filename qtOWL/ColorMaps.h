@@ -22,7 +22,7 @@
 #include <vector>
 #include <string>
 
-namespace owlQT {
+namespace qtOWL {
 
   using namespace owl;
   using namespace owl::common;

@@ -23,30 +23,33 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(${OWL_INCLUDES})
 find_package(OpenGL REQUIRED)
 find_package(CUDA REQUIRED)
-add_library(owlQT STATIC
+add_library(qtOWL STATIC
   OWLViewer.cpp
   InspectMode.cpp
   FlyMode.cpp
   Camera.cpp
-  TransferFunctionEditor.cpp
+
+  AlphaEditor.h
+  AlphaEditor.cpp
+  XFEditor.h
+  XFEditor.cpp
 
   ColorMaps.h
   ColorMaps.cpp
   )
-target_link_libraries(owlQT
+target_link_libraries(qtOWL
   ${OPENGL_opengl_LIBRARY}
   ${CUDA_CUDA_LIBRARY}
   ${CUDA_CUDART_LIBRARY}
   )
-qt5_use_modules(owlQT
+qt5_use_modules(qtOWL
   Widgets
   )
 
-set(OWL_QT_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/.. ${OWL_INCLUDES} PARENT_SCOPE)
-set(OWL_QT_LIBRARIES owlQT PARENT_SCOPE)
+set(QT_OWL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/.. ${OWL_INCLUDES} PARENT_SCOPE)
+set(QT_OWL_LIBRARIES qtOWL PARENT_SCOPE)
   
 macro(OWL_QT_LINK target)
-  target_link_libraries(${target} ${OWL_QT_LIBRARIES})
-  message("linking ${target} to ${OWL_QT_LIBRARIES}")
+  target_link_libraries(${target} ${QT_OWL_LIBRARIES})
   qt5_use_modules(${target} Widgets)
 endmacro()

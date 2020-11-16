@@ -14,16 +14,12 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "ColorMaps.h"
+#include "qtOWL/ColorMaps.h"
 
 #define STB_IMAGE_IMPLEMENTATION 1
 #include "samples/common/3rdParty/stb/stb_image.h"
 
-// namesapce owlQT {
-// // #define STB_IMAGE_IMPLEMENTATION 1
-// }
-
-namespace owlQT {
+namespace qtOWL {
   
   uint8_t paraview_cool_warm[]
   = {

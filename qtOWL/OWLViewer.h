@@ -14,14 +14,15 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "owlQT/Camera.h"
+#pragma once
 
-#include <QApplication>
-#include <QMainWindow>
+#include "qtOWL/Camera.h"
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-#include <QOpenGLBuffer>
 #include <QTimer>
+#include <QApplication>
+#include <QMainWindow>
 
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
@@ -29,7 +30,7 @@
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
 
-namespace owlQT {
+namespace qtOWL {
   
   /*! base abstraction for a camera that can generate rays. For this
     viewer, we assume we're dealine with a camera that has a
