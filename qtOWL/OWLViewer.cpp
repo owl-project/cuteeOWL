@@ -95,41 +95,20 @@ namespace qtOWL {
   OWLViewer::OWLViewer(const std::string &title,
                        const vec2i &initWindowSize,
                        bool visible)
+    : userSizeHint(initWindowSize)
   {
-    // glfwSetErrorCallback(glfw_error_callback);
-    // // glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_FALSE);
-
-    // initGLFW();
-      
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    // glfwWindowHint(GLFW_VISIBLE, visible);
-      
-    // handle = glfwCreateWindow(initWindowSize.x, initWindowSize.y,
-    //                           title.c_str(), NULL, NULL);
-    // if (!handle) {
-    //   glfwTerminate();
-    //   exit(EXIT_FAILURE);
-    // }
-      
-    // glfwSetWindowUserPointer(handle, this);
-    // glfwMakeContextCurrent(handle);
-    // glfwSwapInterval( 1 );
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.start(1);
+    
+    ((QWidget *)this)->resize(QSize(initWindowSize.x,initWindowSize.y));
   }
 
 
 
   OWLViewer::~OWLViewer()
   {
-  
-    makeCurrent();
-    // vbo.destroy();
-    // for (int i = 0; i < 6; ++i)
-    //     delete textures[i];
-    // delete program;
-    doneCurrent();
+    // makeCurrent();
+    // doneCurrent();
   }
 
   QSize OWLViewer::minimumSizeHint() const
@@ -139,85 +118,30 @@ namespace qtOWL {
 
   QSize OWLViewer::sizeHint() const
   {
-    QRect rec = QApplication::desktop()->screenGeometry();
-    int height = rec.height();
-    int width = rec.width();
-    return QSize(width/2, height/2);
-    // return QSize(200, 200);
+    if (userSizeHint != vec2i(0))
+      return QSize(userSizeHint.x,userSizeHint.y);
+    else {
+      QRect rec = QApplication::desktop()->screenGeometry();
+      int height = rec.height();
+      int width = rec.width();
+      return QSize(width/2, height/2);
+    }
   }
-
-  // void OWLViewer::rotateBy(int xAngle, int yAngle, int zAngle)
-  // {
-  //     xRot += xAngle;
-  //     yRot += yAngle;
-  //     zRot += zAngle;
-  //     update();
-  // }
-
-  // void OWLViewer::setClearColor(const QColor &color)
-  // {
-  //     clearColor = color;
-  //     update();
-  // }
-
 
   void OWLViewer::setTitle(const std::string &s)
   {
     setWindowTitle(s.c_str());
-    // std::cout << "owlQT::OWLViewer::setTitle not yet implemented ... ignoring" << std::endl;
   }
 
   void OWLViewer::initializeGL()
   {
     initializeOpenGLFunctions();
     glDisable(GL_DEPTH_TEST);
-
-    // makeObject();
-
-    //     glEnable(GL_DEPTH_TEST);
-    //     glEnable(GL_CULL_FACE);
-
-    // #define PROGRAM_VERTEX_ATTRIBUTE 0
-    // #define PROGRAM_TEXCOORD_ATTRIBUTE 1
-
-    //     QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
-    //     const char *vsrc =
-    //         "attribute highp vec4 vertex;\n"
-    //         "attribute mediump vec4 texCoord;\n"
-    //         "varying mediump vec4 texc;\n"
-    //         "uniform mediump mat4 matrix;\n"
-    //         "void main(void)\n"
-    //         "{\n"
-    //         "    gl_Position = matrix * vertex;\n"
-    //         "    texc = texCoord;\n"
-    //         "}\n";
-    //     vshader->compileSourceCode(vsrc);
-
-    //     QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
-    //     const char *fsrc =
-    //         "uniform sampler2D texture;\n"
-    //         "varying mediump vec4 texc;\n"
-    //         "void main(void)\n"
-    //         "{\n"
-    //         "    gl_FragColor = texture2D(texture, texc.st);\n"
-    //         "}\n";
-    //     fshader->compileSourceCode(fsrc);
-
-    //     program = new QOpenGLShaderProgram;
-    //     program->addShader(vshader);
-    //     program->addShader(fshader);
-    //     program->bindAttributeLocation("vertex", PROGRAM_VERTEX_ATTRIBUTE);
-    //     program->bindAttributeLocation("texCoord", PROGRAM_TEXCOORD_ATTRIBUTE);
-    //     program->link();
-
-    //     program->bind();
-    //     program->setUniformValue("texture", 0);
   }
 
   /* this is the _QT_ widget event handler for redrawing .... */
   void OWLViewer::paintGL()
   {
-#if 1
     static double lastCameraUpdate = -1.f;
     if (camera.lastModified != lastCameraUpdate) {
       cameraChanged();
@@ -229,30 +153,6 @@ namespace qtOWL {
     render();
     // and display on the screen via opengl texture draw call
     draw();
-#else
-    static float clearColor = 0.f;
-    // glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
-    clearColor = fmodf(clearColor+.01f,1.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(clearColor,clearColor,clearColor,1.f);
-    // QMatrix4x4 m;
-    // m.ortho(-0.5f, +0.5f, +0.5f, -0.5f, 4.0f, 15.0f);
-    // m.translate(0.0f, 0.0f, -10.0f);
-    // m.rotate(xRot / 16.0f, 1.0f, 0.0f, 0.0f);
-    // m.rotate(yRot / 16.0f, 0.0f, 1.0f, 0.0f);
-    // m.rotate(zRot / 16.0f, 0.0f, 0.0f, 1.0f);
-
-    // program->setUniformValue("matrix", m);
-    // program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
-    // program->enableAttributeArray(PROGRAM_TEXCOORD_ATTRIBUTE);
-    // program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 5 * sizeof(GLfloat));
-    // program->setAttributeBuffer(PROGRAM_TEXCOORD_ATTRIBUTE, GL_FLOAT, 3 * sizeof(GLfloat), 2, 5 * sizeof(GLfloat));
-
-    // for (int i = 0; i < 6; ++i) {
-    //     textures[i]->bind();
-    //     glDrawArrays(GL_TRIANGLE_FAN, i * 4, 4);
-    // }
-#endif
   }
 
   vec2i OWLViewer::getMousePos() const
@@ -264,11 +164,6 @@ namespace qtOWL {
 
   void OWLViewer::keyPressEvent(QKeyEvent *event)
   {
-    // PING;
-    // qDebug() << "event->key(): " << event->key();
-    // qDebug() << "event->text(): " << event->text();
-    // qDebug() << "event->nativeVirtualKey(): " << event->nativeVirtualKey();
-
     QPoint p = mapFromGlobal(QCursor::pos());
     vec2i where = {p.x(),p.y()};
     const QString keyText = event->text();
@@ -501,7 +396,6 @@ namespace qtOWL {
       = std::make_shared<CameraInspectMode>
       (this,validPoiRange,minPoiDist,maxPoiDist,
        rm==POI? CameraInspectMode::POI: CameraInspectMode::Arcball);
-    // if (!cameraManipulator)
     cameraManipulator = inspectModeManipulator;
   }
 
@@ -516,7 +410,6 @@ namespace qtOWL {
   {
     flyModeManipulator
       = std::make_shared<CameraFlyMode>(this);
-    // if (!cameraManipulator)
     cameraManipulator = flyModeManipulator;
   }
 
@@ -540,13 +433,15 @@ namespace qtOWL {
     if (cameraManipulator) cameraManipulator->mouseDragLeft(where,delta);
   }
 
-  /*! mouse got dragged with left button pressedn, by 'delta' pixels, at last position where */
+  /*! mouse got dragged with left button pressedn, by 'delta' pixels,
+      at last position where */
   void OWLViewer::mouseDragCenter(const vec2i &where, const vec2i &delta)
   {
     if (cameraManipulator) cameraManipulator->mouseDragCenter(where,delta);
   }
 
-  /*! mouse got dragged with left button pressedn, by 'delta' pixels, at last position where */
+  /*! mouse got dragged with left button pressedn, by 'delta' pixels,
+      at last position where */
   void OWLViewer::mouseDragRight (const vec2i &where, const vec2i &delta)
   {
     if (cameraManipulator) cameraManipulator->mouseDragRight(where,delta);

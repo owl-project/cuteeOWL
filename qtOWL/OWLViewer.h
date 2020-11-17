@@ -228,7 +228,8 @@ namespace qtOWL {
     
       
     vec2i    fbSize { 0 };
-
+    /*! what we'll return as sizeHint when qt asks us for it */
+    vec2i    userSizeHint { 0,0 };
     GLuint   fbTexture  {0};
     cudaGraphicsResource_t cuDisplayTexture { 0 };
     uint32_t *fbPointer { nullptr };
