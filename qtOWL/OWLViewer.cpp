@@ -100,7 +100,8 @@ namespace qtOWL {
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.start(1);
     
-    ((QWidget *)this)->resize(QSize(initWindowSize.x,initWindowSize.y));
+    if (initWindowSize != vec2i(0))
+      ((QWidget *)this)->resize(QSize(initWindowSize.x,initWindowSize.y));
   }
 
 
