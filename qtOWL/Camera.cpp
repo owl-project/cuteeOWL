@@ -127,6 +127,7 @@ namespace qtOWL {
       const vec3f vu = fc.upVector;
       const float fovy = fc.getFovyInDegrees();
       std::cout << "(suggested cmdline format, for apps that support this:) "
+                << std::endl
                 << " --camera"
                 << " " << vp.x << " " << vp.y << " " << vp.z
                 << " " << vi.x << " " << vi.y << " " << vi.z

@@ -18,6 +18,7 @@
 #include "qtOWL/XFEditor.h"
 #include <QLabel>
 #include <QtGlobal>
+#include <fstream>
 
 namespace qtOWL {
 
@@ -116,15 +117,54 @@ namespace qtOWL {
     return alphaEditor->getColorMap();
   }
 
-    /*! load transfer function written with saveTo() */
-    void XFEditor::loadFrom(const std::string &fileName)
-    {
-    }
+  static const size_t xfFileFormatMagic = 0x1235abc000;
+  /*! load transfer function written with saveTo() */
+  void XFEditor::loadFrom(const std::string &fileName)
+  {
+    std::ifstream in(fileName,std::ios::binary);
+    size_t magic;
+    in.read((char*)&magic,sizeof(xfFileFormatMagic));
+    if (magic != xfFileFormatMagic)
+      throw std::runtime_error(fileName+": not a valid '.xf' "
+                               "transfer function file!?");
+    float floatVal;
+    in.read((char*)&floatVal,sizeof(floatVal));
+    opacityScaleSpinBox->setValue(floatVal);
+    in.read((char*)&floatVal,sizeof(floatVal));
+    domain_lower->setValue(floatVal);
+    in.read((char*)&floatVal,sizeof(floatVal));
+    domain_upper->setValue(floatVal);
+    
+    ColorMap colorMap;
+    int numColorMapValues;
+    in.read((char*)&numColorMapValues,sizeof(numColorMapValues));
+    colorMap.resize(numColorMapValues);
+    in.read((char*)colorMap.data(),colorMap.size()*sizeof(colorMap[0]));
+    alphaEditor->setColorMap(colorMap,AlphaEditor::OVERWRITE_ALPHA);
+    std::cout << "loaded xf from " << fileName << std::endl;
+  }
   
+  
+  /*! dump entire transfer function to file */
+  void XFEditor::saveTo(const std::string &fileName)
+  {
+    std::ofstream out(fileName,std::ios::binary);
+    out.write((char*)&xfFileFormatMagic,sizeof(xfFileFormatMagic));
+
+    float floatVal;
+    floatVal = opacityScaleSpinBox->value();
+    out.write((char*)&floatVal,sizeof(floatVal));
+    floatVal = domain_lower->value();
+    out.write((char*)&floatVal,sizeof(floatVal));
+    floatVal = domain_upper->value();
+    out.write((char*)&floatVal,sizeof(floatVal));
     
-    /*! dump entire transfer function to file */
-    void XFEditor::saveTo(const std::string &fileName)
-    {
-    }
-    
+    const auto &colorMap = getColorMap();
+    int numColorMapValues = colorMap.size();
+    out.write((char*)&numColorMapValues,sizeof(numColorMapValues));
+    out.write((char*)colorMap.data(),colorMap.size()*sizeof(colorMap[0]));
+    std::cout << "#qtOWL.XFEditor: saved transfer function to "
+              <<  fileName << std::endl;
+  }
+  
 }
