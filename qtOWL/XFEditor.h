@@ -59,6 +59,7 @@ namespace qtOWL {
         because the user drew in it, or selected anothe ron from the
         drobox, etc */
     void colorMapChanged(qtOWL::XFEditor *);
+    void opacityScaleChanged(double);
                                      
   public slots:
     /*! we'll have the qcombobox that selsects the desired color map
@@ -76,6 +77,7 @@ namespace qtOWL {
     QComboBox      *cmSelector;
     QDoubleSpinBox *domain_lower;
     QDoubleSpinBox *domain_upper;
+    QDoubleSpinBox *opacityScaleSpinBox;
   };
 
 }

@@ -16,6 +16,7 @@
 
 #include "qtOWL/XFEditor.h"
 #include <QLabel>
+#include <QtGlobal>
 
 namespace qtOWL {
 
@@ -48,11 +49,24 @@ namespace qtOWL {
     for (auto cmName : colorMaps.getNames())
       cmSelector->addItem(QString(cmName.c_str()));
 
+    QVBoxLayout *opacityScaleLayout = new QVBoxLayout;
+
+    opacityScaleSpinBox = new QDoubleSpinBox;
+    opacityScaleSpinBox->setDecimals(3);
+    opacityScaleSpinBox->setValue(1.);
+    opacityScaleSpinBox->setRange(0.,1.);
+    opacityScaleSpinBox->setSingleStep(.03);
+    opacityScaleLayout->addWidget(new QLabel("Opacity scale"),0,0);
+    opacityScaleLayout->addWidget(opacityScaleSpinBox);
+    QWidget *opacityScaleWidget = new QWidget;
+    opacityScaleWidget->setLayout(opacityScaleLayout);
+
     layout = new QFormLayout;
     layout->addWidget(alphaEditor);
     layout->addWidget(cmSelector);
 
       
+    layout->addWidget(opacityScaleWidget);
     layout->addWidget(rangeWidget);
     setLayout(layout);
       
@@ -61,6 +75,8 @@ namespace qtOWL {
             this, SLOT(cmSelectionChanged(int)));
     connect(alphaEditor, SIGNAL(colorMapChanged(qtOWL::AlphaEditor*)),
             this, SLOT(alphaEditorChanged(qtOWL::AlphaEditor*)));
+    connect(opacityScaleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, &qtOWL::XFEditor::opacityScaleChanged);
   }
 
   /*! we'll have the qcombobox that selsects the desired color map
