@@ -142,6 +142,8 @@ namespace qtOWL {
     in.read((char*)colorMap.data(),colorMap.size()*sizeof(colorMap[0]));
     alphaEditor->setColorMap(colorMap,AlphaEditor::OVERWRITE_ALPHA);
     std::cout << "loaded xf from " << fileName << std::endl;
+    
+    emit colorMapChanged(this);
   }
   
   
