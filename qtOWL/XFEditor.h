@@ -54,6 +54,12 @@ namespace qtOWL {
 
     const ColorMap &getColorMap() const;
     
+    /*! load transfer function written with saveTo() */
+    void loadFrom(const std::string &fileName);
+    
+    /*! dump entire transfer function to file */
+    void saveTo(const std::string &fileName);
+    
   signals:
     /*! the color map (in the alpha editor) got changed; either
         because the user drew in it, or selected anothe ron from the

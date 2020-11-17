@@ -23,7 +23,7 @@ namespace qtOWL {
 
   XFEditor::XFEditor()
   {
-    QGridLayout *rangeLayout = new QGridLayout;//(2,2);
+    QGridLayout *gridLayout = new QGridLayout;//(2,2);
       
     domain_lower = new QDoubleSpinBox;
     domain_upper = new QDoubleSpinBox;
@@ -32,17 +32,30 @@ namespace qtOWL {
     domain_lower->setValue(domain.lower);
     domain_lower->setRange(domain.lower,domain.upper);
     domain_lower->setSingleStep((domain.upper-domain.lower)/40.f);
+    gridLayout->addWidget(new QLabel("lower"),0,0);
+    gridLayout->addWidget(domain_lower,0,1);
 
     domain_upper->setValue(domain.upper);
     domain_upper->setRange(domain.lower,domain.upper);
     domain_upper->setSingleStep((domain.upper-domain.lower)/40.f);
+    gridLayout->addWidget(new QLabel("upper"),1,0);
+    gridLayout->addWidget(domain_upper,1,1);
 
-    rangeLayout->addWidget(new QLabel("upper"),0,0);
-    rangeLayout->addWidget(domain_lower,1,0);
-    rangeLayout->addWidget(new QLabel("upper"),0,1);
-    rangeLayout->addWidget(domain_upper,1,1);
-    QWidget *rangeWidget = new QWidget;
-    rangeWidget->setLayout(rangeLayout);
+    opacityScaleSpinBox = new QDoubleSpinBox;
+    opacityScaleSpinBox->setDecimals(3);
+    opacityScaleSpinBox->setValue(1.f);
+    opacityScaleSpinBox->setRange(0.f,1.f);
+    opacityScaleSpinBox->setSingleStep(.03f);
+    gridLayout->addWidget(new QLabel("opacity scale"),2,0);
+    gridLayout->addWidget(opacityScaleSpinBox,2,1);
+    
+    // opacityScaleLayout->addWidget(new QLabel("Opacity scale"),0,0);
+    // opacityScaleLayout->addWidget(opacityScaleSpinBox);
+    // QWidget *opacityScaleWidget = new QWidget;
+    // opacityScaleWidget->setLayout(opacityScaleLayout);
+
+    QWidget *valuesWidget = new QWidget;
+    valuesWidget->setLayout(gridLayout);
       
     alphaEditor = new AlphaEditor(colorMaps.getMap(0));
       
@@ -52,23 +65,10 @@ namespace qtOWL {
 
     QVBoxLayout *opacityScaleLayout = new QVBoxLayout;
 
-    opacityScaleSpinBox = new QDoubleSpinBox;
-    opacityScaleSpinBox->setDecimals(3);
-    opacityScaleSpinBox->setValue(1.);
-    opacityScaleSpinBox->setRange(0.,1.);
-    opacityScaleSpinBox->setSingleStep(.03);
-    opacityScaleLayout->addWidget(new QLabel("Opacity scale"),0,0);
-    opacityScaleLayout->addWidget(opacityScaleSpinBox);
-    QWidget *opacityScaleWidget = new QWidget;
-    opacityScaleWidget->setLayout(opacityScaleLayout);
-
     layout = new QFormLayout;
     layout->addWidget(alphaEditor);
     layout->addWidget(cmSelector);
-
-      
-    layout->addWidget(opacityScaleWidget);
-    layout->addWidget(rangeWidget);
+    layout->addWidget(valuesWidget);
     setLayout(layout);
       
     // connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -115,5 +115,16 @@ namespace qtOWL {
   {
     return alphaEditor->getColorMap();
   }
+
+    /*! load transfer function written with saveTo() */
+    void XFEditor::loadFrom(const std::string &fileName)
+    {
+    }
+  
+    
+    /*! dump entire transfer function to file */
+    void XFEditor::saveTo(const std::string &fileName)
+    {
+    }
     
 }

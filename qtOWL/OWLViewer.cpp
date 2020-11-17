@@ -411,6 +411,7 @@ namespace qtOWL {
     } else {
       resourceSharingSuccessful = true;
     }
+    setAspect(fbSize.x/float(fbSize.y));
   }
 
     
