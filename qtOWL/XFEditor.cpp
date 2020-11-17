@@ -14,6 +14,7 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
+#include <cassert>
 #include "qtOWL/XFEditor.h"
 #include <QLabel>
 #include <QtGlobal>
@@ -75,6 +76,10 @@ namespace qtOWL {
             this, SLOT(cmSelectionChanged(int)));
     connect(alphaEditor, SIGNAL(colorMapChanged(qtOWL::AlphaEditor*)),
             this, SLOT(alphaEditorChanged(qtOWL::AlphaEditor*)));
+    connect(domain_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, &qtOWL::XFEditor::emitRangeChanged);
+    connect(domain_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, &qtOWL::XFEditor::emitRangeChanged);
     connect(opacityScaleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, &qtOWL::XFEditor::opacityScaleChanged);
   }
@@ -93,6 +98,17 @@ namespace qtOWL {
   {
     //colorMapChangedCB(&ae->xf);
     emit colorMapChanged(this);
+  }
+
+  /*! one of the range spin boxes' value changed */
+  void XFEditor::emitRangeChanged(double value)
+  {
+    if (sender() == domain_lower)
+      emit rangeChanged({value,domain_upper->value()});
+    else if (sender() == domain_upper)
+      emit rangeChanged({domain_lower->value(),value});
+    else
+      assert(0);
   }
   
   const ColorMap &XFEditor::getColorMap() const

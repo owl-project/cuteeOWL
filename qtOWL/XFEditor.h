@@ -60,6 +60,7 @@ namespace qtOWL {
         drobox, etc */
     void colorMapChanged(qtOWL::XFEditor *);
     void opacityScaleChanged(double);
+    void rangeChanged(interval<double>);
                                      
   public slots:
     /*! we'll have the qcombobox that selsects the desired color map
@@ -69,6 +70,9 @@ namespace qtOWL {
     /*! the alpha editor child widget changed something to the color
         map*/
     void alphaEditorChanged(qtOWL::AlphaEditor *ae);
+
+  private slots:
+    void emitRangeChanged(double);
     
   private:
     ColorMapLibrary colorMaps;
