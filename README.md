@@ -16,9 +16,14 @@ predefined color maps.
 
 Here two screnshots of what these widgets look like, first the
 transfer function editor:
-![qtOWL Transfer Function Editor](md/cuteeOWL_XFEditor.png.jpg){.samplepic}
+![qtOWL Transfer Function Editor](md/cuteeOWL_XFEditor.png.jpg)
 
-![qtOWL OWLViewer Widget](md/owlDVR.png.jpg){.samplepic}
+.... and second, a sample direct volume renderer (`owlDVR`)
+that is derived from the `qtOWL::OWLViewer` widget (the actual rendering
+happens in `owlDVR`, `qtOWL::OWLViewer` only handles the 3D camera
+and frame buffer):
+
+![qtOWL OWLViewer Widget](md/owlDVR.png.jpg)
 
 ## Relation to / Dependence on OWL
 
