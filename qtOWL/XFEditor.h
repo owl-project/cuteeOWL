@@ -21,14 +21,7 @@
 #include <QFormLayout>
 #include <QComboBox>
 #include <QDoubleSpinBox>
-
-// #include <QOpenGLWidget>
-// #include <QOpenGLFunctions>
-// #include <QOpenGLBuffer>
-// #include <QTimer>
-
-// #include <QLabel>
-// #include <QVBoxLayout>
+#include <QLineEdit>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
@@ -50,7 +43,9 @@ namespace qtOWL {
     Q_OBJECT
 
   public:
-    XFEditor();
+    /*! construct a new xf editor widget around the given 'domain'
+        (ie, range of valid inputs) of a scalar field. */
+    XFEditor(const range1f &domain);
 
     const ColorMap &getColorMap() const;
     
@@ -66,8 +61,8 @@ namespace qtOWL {
         drobox, etc */
     void colorMapChanged(qtOWL::XFEditor *);
     void opacityScaleChanged(double);
-    void rangeChanged(interval<double>);
-                                     
+    void rangeChanged(range1f);
+
   public slots:
     /*! we'll have the qcombobox that selsects the desired color map
       call this, and then update the alpha editor */
@@ -78,16 +73,27 @@ namespace qtOWL {
     void alphaEditorChanged(qtOWL::AlphaEditor *ae);
 
   private slots:
-    void emitRangeChanged(double);
+    /*! gets called by the absolute domain qlineedits */
+    void emitAbsRangeChanged(const QString &);
+    /*! gets called by the relative domain double spinners */
+    void emitRelRangeChanged(double);
+    
+  public:
+    /* both different rangeChanged() signals route to this one
+       implementaion, since type doesn't matter */
+    void signal_rangeChanged();
     
   private:
     ColorMapLibrary colorMaps;
     AlphaEditor    *alphaEditor;
     QFormLayout    *layout;
     QComboBox      *cmSelector;
-    QDoubleSpinBox *domain_lower;
-    QDoubleSpinBox *domain_upper;
+    QLineEdit      *abs_domain_lower;
+    QLineEdit      *abs_domain_upper;
+    QDoubleSpinBox *rel_domain_lower;
+    QDoubleSpinBox *rel_domain_upper;
     QDoubleSpinBox *opacityScaleSpinBox;
+    range1f         dataValueRange;
   };
 
 }
