@@ -22,33 +22,71 @@
 
 namespace qtOWL {
 
-  XFEditor::XFEditor()
+  XFEditor::XFEditor(const range1f &domain)
+    : dataValueRange(domain)
   {
     QGridLayout *gridLayout = new QGridLayout;//(2,2);
-      
-    domain_lower = new QDoubleSpinBox;
-    domain_upper = new QDoubleSpinBox;
 
-    range1f domain(0.f,1.f);
-    domain_lower->setValue(domain.lower);
-    domain_lower->setRange(domain.lower,domain.upper);
-    domain_lower->setSingleStep((domain.upper-domain.lower)/40.f);
-    gridLayout->addWidget(new QLabel("lower"),0,0);
-    gridLayout->addWidget(domain_lower,0,1);
+    // -------------------------------------------------------
+    // general info:
+    // -------------------------------------------------------
+    std::string infoText
+      = "value range of data (absolute) ["
+      +std::to_string(domain.lower)
+      +".."
+      +std::to_string(domain.upper)
+      +"]";
+    gridLayout->addWidget(new QLabel(QString(infoText.c_str())),0,0,1,3);
+    gridLayout->addWidget(new QLabel("domain (abs)"),1,0);
 
-    domain_upper->setValue(domain.upper);
-    domain_upper->setRange(domain.lower,domain.upper);
-    domain_upper->setSingleStep((domain.upper-domain.lower)/40.f);
-    gridLayout->addWidget(new QLabel("upper"),1,0);
-    gridLayout->addWidget(domain_upper,1,1);
+    // -------------------------------------------------------
+    // absolute xf domain (editable, no spinners, absolute values)
+    // -------------------------------------------------------
+    abs_domain_lower = new QLineEdit;
+    abs_domain_lower->setValidator(new QDoubleValidator(domain.lower,domain.upper,0));
+    abs_domain_lower->setText(QString::number(domain.lower));
+    gridLayout->addWidget(abs_domain_lower,1,1);
 
+    abs_domain_upper = new QLineEdit;
+    abs_domain_upper->setValidator(new QDoubleValidator(domain.lower,domain.upper,0));
+    abs_domain_upper->setText(QString::number(domain.upper));
+    gridLayout->addWidget(abs_domain_upper,1,2);
+
+
+    // -------------------------------------------------------
+    // relative range (within the absolute one)
+    // -------------------------------------------------------
+    gridLayout->addWidget(new QLabel("domain (rel)"),2,0);
+
+    rel_domain_lower = new QDoubleSpinBox;
+    rel_domain_lower->setValue(0.f);
+    rel_domain_lower->setDecimals(0);
+    rel_domain_lower->setRange(0.f,100.f);
+    rel_domain_lower->setSingleStep(1.f);
+
+    rel_domain_upper = new QDoubleSpinBox;
+    rel_domain_upper->setValue(100.f);
+    rel_domain_upper->setDecimals(0);
+    rel_domain_upper->setRange(0.f,100.f);
+    rel_domain_upper->setSingleStep(1.f);
+
+    gridLayout->addWidget(rel_domain_lower,2,1);
+    gridLayout->addWidget(rel_domain_upper,2,2);
+    // gridLayout->addWidget(new QLabel("lower"),0,0);
+    // gridLayout->addWidget(domain_lower,0,1);
+    // gridLayout->addWidget(new QLabel("upper"),1,0);
+    // gridLayout->addWidget(domain_upper,1,1);
+
+    // -------------------------------------------------------
+    // opacity scale
+    // -------------------------------------------------------
     opacityScaleSpinBox = new QDoubleSpinBox;
     opacityScaleSpinBox->setDecimals(3);
     opacityScaleSpinBox->setValue(1.f);
     opacityScaleSpinBox->setRange(0.f,1.f);
     opacityScaleSpinBox->setSingleStep(.03f);
-    gridLayout->addWidget(new QLabel("opacity scale"),2,0);
-    gridLayout->addWidget(opacityScaleSpinBox,2,1);
+    gridLayout->addWidget(new QLabel("opacity scale"),3,0);
+    gridLayout->addWidget(opacityScaleSpinBox,3,1);
     
     // opacityScaleLayout->addWidget(new QLabel("Opacity scale"),0,0);
     // opacityScaleLayout->addWidget(opacityScaleSpinBox);
@@ -77,10 +115,14 @@ namespace qtOWL {
             this, SLOT(cmSelectionChanged(int)));
     connect(alphaEditor, SIGNAL(colorMapChanged(qtOWL::AlphaEditor*)),
             this, SLOT(alphaEditorChanged(qtOWL::AlphaEditor*)));
-    connect(domain_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this, &qtOWL::XFEditor::emitRangeChanged);
-    connect(domain_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this, &qtOWL::XFEditor::emitRangeChanged);
+    connect(abs_domain_lower, QOverload<const QString &>::of(&QLineEdit::textChanged),
+            this, &qtOWL::XFEditor::emitAbsRangeChanged);
+    connect(abs_domain_upper, QOverload<const QString &>::of(&QLineEdit::textChanged),
+            this, &qtOWL::XFEditor::emitAbsRangeChanged);
+    connect(rel_domain_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, &qtOWL::XFEditor::emitRelRangeChanged);
+    connect(rel_domain_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, &qtOWL::XFEditor::emitRelRangeChanged);
     connect(opacityScaleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, &qtOWL::XFEditor::opacityScaleChanged);
   }
@@ -101,15 +143,41 @@ namespace qtOWL {
     emit colorMapChanged(this);
   }
 
-  /*! one of the range spin boxes' value changed */
-  void XFEditor::emitRangeChanged(double value)
+  inline range1f order(const range1f v)
   {
-    if (sender() == domain_lower)
-      emit rangeChanged({value,domain_upper->value()});
-    else if (sender() == domain_upper)
-      emit rangeChanged({domain_lower->value(),value});
-    else
-      assert(0);
+    return { std::min(v.lower,v.upper),std::max(v.lower,v.upper) };
+  }
+
+  inline float lerp(const range1f v, const float f)
+  {
+    return (1.f-f)*v.lower + f*v.upper;
+  }
+  
+  /*! one of the range spin boxes' value changed */
+  void XFEditor::signal_rangeChanged()
+  {
+    range1f absRange(abs_domain_lower->text().toDouble(),
+                     abs_domain_upper->text().toDouble());
+    absRange = order(absRange);
+    
+    range1f relRange(.01f*rel_domain_lower->value(),
+                     .01f*rel_domain_upper->value());
+    relRange = order(relRange);
+    
+    range1f finalRange(lerp(absRange,relRange.lower),
+                       lerp(absRange,relRange.upper));
+    emit rangeChanged(finalRange);
+  }
+  
+  /*! one of the range spin boxes' value changed */
+  void XFEditor::emitRelRangeChanged(double)
+  {
+    signal_rangeChanged();
+  }
+  /*! one of the range spin boxes' value changed */
+  void XFEditor::emitAbsRangeChanged(const QString &)
+  {
+    signal_rangeChanged();
   }
   
   const ColorMap &XFEditor::getColorMap() const
@@ -130,11 +198,17 @@ namespace qtOWL {
     float floatVal;
     in.read((char*)&floatVal,sizeof(floatVal));
     opacityScaleSpinBox->setValue(floatVal);
-    in.read((char*)&floatVal,sizeof(floatVal));
-    domain_lower->setValue(floatVal);
-    in.read((char*)&floatVal,sizeof(floatVal));
-    domain_upper->setValue(floatVal);
     
+    in.read((char*)&floatVal,sizeof(floatVal));
+    abs_domain_lower->setText(QString::number(floatVal));
+    in.read((char*)&floatVal,sizeof(floatVal));
+    abs_domain_upper->setText(QString::number(floatVal));
+
+    in.read((char*)&floatVal,sizeof(floatVal));
+    rel_domain_lower->setValue(floatVal);
+    in.read((char*)&floatVal,sizeof(floatVal));
+    rel_domain_upper->setValue(floatVal);
+
     ColorMap colorMap;
     int numColorMapValues;
     in.read((char*)&numColorMapValues,sizeof(numColorMapValues));
@@ -156,9 +230,15 @@ namespace qtOWL {
     float floatVal;
     floatVal = opacityScaleSpinBox->value();
     out.write((char*)&floatVal,sizeof(floatVal));
-    floatVal = domain_lower->value();
+    
+    floatVal = abs_domain_lower->text().toDouble();
     out.write((char*)&floatVal,sizeof(floatVal));
-    floatVal = domain_upper->value();
+    floatVal = abs_domain_upper->text().toDouble();
+    out.write((char*)&floatVal,sizeof(floatVal));
+
+    floatVal = rel_domain_lower->value();
+    out.write((char*)&floatVal,sizeof(floatVal));
+    floatVal = rel_domain_upper->value();
     out.write((char*)&floatVal,sizeof(floatVal));
     
     const auto &colorMap = getColorMap();
