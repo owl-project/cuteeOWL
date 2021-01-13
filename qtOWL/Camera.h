@@ -82,7 +82,7 @@ namespace qtOWL {
     void setUpVector(const vec3f &up)
     { upVector = up; forceUpFrame(); }
 
-    linear3f      frame         { one };
+    linear3f      frame         { owl::common::one };
     vec3f         position      { 0,-1,0 };
     /*! distance to the 'point of interst' (poi); e.g., the point we
       will rotate around */
