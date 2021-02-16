@@ -17,6 +17,7 @@
 #pragma once
 
 #include "qtOWL/Camera.h"
+#include "qtOWL/CameraManip.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>

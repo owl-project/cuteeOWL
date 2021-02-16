@@ -32,6 +32,7 @@ add_library(qtOWL STATIC
   InspectMode.cpp
   FlyMode.cpp
   Camera.cpp
+  CameraManip.cpp
 
   AlphaEditor.h
   AlphaEditor.cpp

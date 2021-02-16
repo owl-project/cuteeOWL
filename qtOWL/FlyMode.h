@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "Camera.h"
+#include "CameraManip.h"
 
 namespace qtOWL {
 

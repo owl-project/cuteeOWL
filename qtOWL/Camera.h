@@ -19,8 +19,6 @@
 #include "owl/common/math/box.h"
 #include "owl/common/math/LinearSpace.h"
 
-#include <QKeyEvent>
-
 #include <vector>
 #include <memory>
 #ifdef _GNUC_
@@ -34,8 +32,6 @@ namespace qtOWL {
   
   inline float toRadian(float deg) { return deg * float(M_PI/180.f); }
   inline float toDegrees(float rad) { return rad / float(M_PI/180.f); }
-
-  struct OWLViewer;
 
   /*! the entire state for someting that can 'control' a camera -
     ie, that can rotate, move, focus, force-up, etc, a
@@ -106,47 +102,6 @@ namespace qtOWL {
     float         fovyInDegrees { 60.f };
 
     double        lastModified = 0.;
-  };
-
-  // ------------------------------------------------------------------
-  /*! abstract base class that allows to manipulate a renderable
-    camera */
-  struct CameraManipulator {
-    CameraManipulator(OWLViewer *viewer) : viewer(viewer) {}
-
-   /*! this gets called when the user presses a key on the keyboard ... */
-    virtual void key(char key, const vec2i &/*where*/);
-    
-
-    //  /*! this gets called when the user presses a key on the keyboard ... */
-    // virtual void key(QKeyEvent *event);
-
-    /*! this gets called when the user presses a key on the keyboard ... */
-     virtual void special(QKeyEvent *event, const vec2i &where) { };
-
-    /*! mouse got dragged with left button pressedn, by 'delta'
-      pixels, at last position where */
-    virtual void mouseDragLeft  (const vec2i &where, const vec2i &delta) {}
-
-    /*! mouse got dragged with left button pressedn, by 'delta'
-      pixels, at last position where */
-    virtual void mouseDragCenter(const vec2i &where, const vec2i &delta) {}
-
-    /*! mouse got dragged with left button pressedn, by 'delta'
-      pixels, at last position where */
-    virtual void mouseDragRight (const vec2i &where, const vec2i &delta) {}
-
-    /*! mouse button got either pressed or released at given location */
-    virtual void mouseButtonLeft  (const vec2i &where, bool pressed) {}
-
-    /*! mouse button got either pressed or released at given location */
-    virtual void mouseButtonCenter(const vec2i &where, bool pressed) {}
-
-    /*! mouse button got either pressed or released at given location */
-    virtual void mouseButtonRight (const vec2i &where, bool pressed) {}
-
-  protected:
-    OWLViewer *const viewer;
   };
 
 } // ::owlQT
