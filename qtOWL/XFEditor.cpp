@@ -186,37 +186,66 @@ namespace qtOWL {
   }
 
   static const size_t xfFileFormatMagic = 0x1235abc000;
-  /*! load transfer function written with saveTo() */
+  /*! load either a transfer function written with saveTo(), or
+      whole RGBA maps from a png file */
   void XFEditor::loadFrom(const std::string &fileName)
   {
     std::ifstream in(fileName,std::ios::binary);
     size_t magic;
     in.read((char*)&magic,sizeof(xfFileFormatMagic));
-    if (magic != xfFileFormatMagic)
-      throw std::runtime_error(fileName+": not a valid '.xf' "
-                               "transfer function file!?");
-    float floatVal;
-    in.read((char*)&floatVal,sizeof(floatVal));
-    opacityScaleSpinBox->setValue(floatVal);
+    if (magic != xfFileFormatMagic) {
+      // Try loading as png
+      try {
+        in.close();
+        // Determine file size
+        in.open(fileName,std::ios::binary|std::ios::ate);
+        size_t numBytes = in.tellg();
+        // Load whole file content
+        in.close();
+        std::vector<uint8_t> asPNG(numBytes);
+        in.open(fileName,std::ios::binary);
+        in.read((char *)asPNG.data(),numBytes);
+        ColorMap colorMap = ColorMap::fromPNG(asPNG.data(),numBytes);
+        // Add as color map
+        colorMaps.addColorMap(colorMap,fileName);
+        cmSelector->clear();
+        for (auto cmName : colorMaps.getNames())
+          cmSelector->addItem(QString(cmName.c_str()));
+        // Select the color map, but make sure the
+        // combo box's signal won't trigger
+        cmSelector->blockSignals(true);
+        cmSelector->setCurrentIndex(0);
+        cmSelector->blockSignals(false);
+        // Add as alpha map (make sure to use the resampled map here!)
+        alphaEditor->setColorMap(colorMaps.getMap(0),AlphaEditor::OVERWRITE_ALPHA);
+      } catch (...) {
+        throw std::runtime_error(fileName+": not a valid '.xf' "
+                                 "transfer function file!?");
+      }
+    } else {
+      float floatVal;
+      in.read((char*)&floatVal,sizeof(floatVal));
+      opacityScaleSpinBox->setValue(floatVal);
+      
+      in.read((char*)&floatVal,sizeof(floatVal));
+      abs_domain_lower->setText(QString::number(floatVal));
+      in.read((char*)&floatVal,sizeof(floatVal));
+      abs_domain_upper->setText(QString::number(floatVal));
+
+      in.read((char*)&floatVal,sizeof(floatVal));
+      rel_domain_lower->setValue(floatVal);
+      in.read((char*)&floatVal,sizeof(floatVal));
+      rel_domain_upper->setValue(floatVal);
+
+      ColorMap colorMap;
+      int numColorMapValues;
+      in.read((char*)&numColorMapValues,sizeof(numColorMapValues));
+      colorMap.resize(numColorMapValues);
+      in.read((char*)colorMap.data(),colorMap.size()*sizeof(colorMap[0]));
+      alphaEditor->setColorMap(colorMap,AlphaEditor::OVERWRITE_ALPHA);
+    }
     
-    in.read((char*)&floatVal,sizeof(floatVal));
-    abs_domain_lower->setText(QString::number(floatVal));
-    in.read((char*)&floatVal,sizeof(floatVal));
-    abs_domain_upper->setText(QString::number(floatVal));
-
-    in.read((char*)&floatVal,sizeof(floatVal));
-    rel_domain_lower->setValue(floatVal);
-    in.read((char*)&floatVal,sizeof(floatVal));
-    rel_domain_upper->setValue(floatVal);
-
-    ColorMap colorMap;
-    int numColorMapValues;
-    in.read((char*)&numColorMapValues,sizeof(numColorMapValues));
-    colorMap.resize(numColorMapValues);
-    in.read((char*)colorMap.data(),colorMap.size()*sizeof(colorMap[0]));
-    alphaEditor->setColorMap(colorMap,AlphaEditor::OVERWRITE_ALPHA);
     std::cout << "loaded xf from " << fileName << std::endl;
-    
     emit colorMapChanged(this);
   }
   

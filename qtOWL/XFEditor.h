@@ -49,7 +49,8 @@ namespace qtOWL {
 
     const ColorMap &getColorMap() const;
     
-    /*! load transfer function written with saveTo() */
+    /*! load either a transfer function written with saveTo(), or
+        whole RGBA maps from a png file */
     void loadFrom(const std::string &fileName);
     
     /*! dump entire transfer function to file */

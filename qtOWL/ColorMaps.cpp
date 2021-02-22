@@ -194,7 +194,7 @@ namespace qtOWL {
         = (n == 3)
         ? 1.f
         : img_data[i * 4 + 3] / 255.f;
-      v.w = 1.f;
+      // v.w = 1.f;
       values_.push_back(v);
     }
 
@@ -274,6 +274,15 @@ namespace qtOWL {
 
     for (auto &map : knownMaps)
       map.second = map.second.resampledTo(numSamplesPerMap);
+  }
+
+  /*! adds a color map from a png file to the library */
+  void ColorMapLibrary::addColorMap(const ColorMap &cm,
+                                    std::string name,
+                                    int numSamples)
+  {
+    // Add to the beginning of list
+    knownMaps.insert(knownMaps.begin(),1,{name,cm.resampledTo(numSamples)});
   }
 
 }

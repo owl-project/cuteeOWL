@@ -33,7 +33,7 @@ namespace qtOWL {
   {
     static ColorMap fromPNG(const uint8_t asPNG[],
                             size_t numBytes);
-    
+  
     /*! returns re-sampled version of this same map, with numSamples
         samples */
     ColorMap resampledTo(int numSamples) const;
@@ -51,6 +51,11 @@ namespace qtOWL {
     /*! return a color map library of hardcoded, embedded color
       maps */
     void loadDefaults(int numSamplesPerMap=128);
+
+    /*! adds a color map from a png file to the library */
+    void addColorMap(const ColorMap &cm,
+                     std::string name,
+                     int numSamples=128);
     
     /*! returns a std::vector with all the names of color maps known
       in this library */
