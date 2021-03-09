@@ -72,11 +72,13 @@ namespace qtOWL {
   {
     int width  = viewer->getWindowSize().x;
     int height = viewer->getWindowSize().y;
+    float aspect = float(width) / float(height);
 
     vec3f v(0.f);
 
     v.x =  (where.x - .5f * width ) / (.5f * width );
     v.y = -(where.y - .5f * height) / (.5f * height);
+    v.x *= aspect;
 
     float d = v.x*v.x+v.y*v.y;
 
@@ -86,7 +88,7 @@ namespace qtOWL {
       v.x /= length;
       v.y /= length;
     } else
-      v.z = sqrtf(1.f-d);
+      v.z = 2.0f*sqrtf(1.f-d);
 
     return v;
   }
