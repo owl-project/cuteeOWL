@@ -61,13 +61,13 @@ namespace qtOWL {
     rel_domain_lower = new QDoubleSpinBox;
     rel_domain_lower->setValue(0.f);
     rel_domain_lower->setDecimals(0);
-    rel_domain_lower->setRange(0.f,100.f);
+    rel_domain_lower->setRange(-1000.f,1000.f);
     rel_domain_lower->setSingleStep(1.f);
 
     rel_domain_upper = new QDoubleSpinBox;
     rel_domain_upper->setValue(100.f);
     rel_domain_upper->setDecimals(0);
-    rel_domain_upper->setRange(0.f,100.f);
+    rel_domain_upper->setRange(-1000.f,1000.f);
     rel_domain_upper->setSingleStep(1.f);
 
     gridLayout->addWidget(rel_domain_lower,2,1);
