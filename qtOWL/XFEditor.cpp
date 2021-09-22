@@ -22,6 +22,8 @@
 
 namespace qtOWL {
 
+  XFEditor::XFEditor() : XFEditor(range1f(0.f, 1.f)) {}
+
   XFEditor::XFEditor(const range1f &domain)
     : dataValueRange(domain)
   {
@@ -87,7 +89,7 @@ namespace qtOWL {
     opacityScaleSpinBox->setSingleStep(.03f);
     gridLayout->addWidget(new QLabel("opacity scale"),3,0);
     gridLayout->addWidget(opacityScaleSpinBox,3,1);
-    
+
     // opacityScaleLayout->addWidget(new QLabel("Opacity scale"),0,0);
     // opacityScaleLayout->addWidget(opacityScaleSpinBox);
     // QWidget *opacityScaleWidget = new QWidget;
@@ -95,9 +97,9 @@ namespace qtOWL {
 
     QWidget *valuesWidget = new QWidget;
     valuesWidget->setLayout(gridLayout);
-      
+
     alphaEditor = new AlphaEditor(colorMaps.getMap(0));
-      
+
     cmSelector = new QComboBox;
     for (auto cmName : colorMaps.getNames())
       cmSelector->addItem(QString(cmName.c_str()));
@@ -109,7 +111,7 @@ namespace qtOWL {
     layout->addWidget(cmSelector);
     layout->addWidget(valuesWidget);
     setLayout(layout);
-      
+
     // connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     connect(cmSelector, SIGNAL(currentIndexChanged(int)),
             this, SLOT(cmSelectionChanged(int)));
@@ -134,7 +136,7 @@ namespace qtOWL {
     alphaEditor->setColorMap(colorMaps.getMap(idx),
                              AlphaEditor::KEEP_ALPHA);
   }
-  
+
   /*! the alpha editor child widget changed something to the color
     map*/
   void XFEditor::alphaEditorChanged(AlphaEditor *ae)
@@ -152,23 +154,23 @@ namespace qtOWL {
   {
     return (1.f-f)*v.lower + f*v.upper;
   }
-  
+
   /*! one of the range spin boxes' value changed */
   void XFEditor::signal_rangeChanged()
   {
     range1f absRange(abs_domain_lower->text().toDouble(),
                      abs_domain_upper->text().toDouble());
     absRange = order(absRange);
-    
+
     range1f relRange(.01f*rel_domain_lower->value(),
                      .01f*rel_domain_upper->value());
     relRange = order(relRange);
-    
+
     range1f finalRange(lerp(absRange,relRange.lower),
                        lerp(absRange,relRange.upper));
     emit rangeChanged(finalRange);
   }
-  
+
   /*! one of the range spin boxes' value changed */
   void XFEditor::emitRelRangeChanged(double)
   {
@@ -179,7 +181,7 @@ namespace qtOWL {
   {
     signal_rangeChanged();
   }
-  
+
   const ColorMap &XFEditor::getColorMap() const
   {
     return alphaEditor->getColorMap();
@@ -226,7 +228,7 @@ namespace qtOWL {
       float floatVal;
       in.read((char*)&floatVal,sizeof(floatVal));
       opacityScaleSpinBox->setValue(floatVal);
-      
+
       in.read((char*)&floatVal,sizeof(floatVal));
       abs_domain_lower->setText(QString::number(floatVal));
       in.read((char*)&floatVal,sizeof(floatVal));
@@ -244,12 +246,12 @@ namespace qtOWL {
       in.read((char*)colorMap.data(),colorMap.size()*sizeof(colorMap[0]));
       alphaEditor->setColorMap(colorMap,AlphaEditor::OVERWRITE_ALPHA);
     }
-    
+
     std::cout << "loaded xf from " << fileName << std::endl;
     emit colorMapChanged(this);
   }
-  
-  
+
+
   /*! dump entire transfer function to file */
   void XFEditor::saveTo(const std::string &fileName)
   {
@@ -259,7 +261,7 @@ namespace qtOWL {
     float floatVal;
     floatVal = opacityScaleSpinBox->value();
     out.write((char*)&floatVal,sizeof(floatVal));
-    
+
     floatVal = abs_domain_lower->text().toDouble();
     out.write((char*)&floatVal,sizeof(floatVal));
     floatVal = abs_domain_upper->text().toDouble();
@@ -269,7 +271,7 @@ namespace qtOWL {
     out.write((char*)&floatVal,sizeof(floatVal));
     floatVal = rel_domain_upper->value();
     out.write((char*)&floatVal,sizeof(floatVal));
-    
+
     const auto &colorMap = getColorMap();
     int numColorMapValues = colorMap.size();
     out.write((char*)&numColorMapValues,sizeof(numColorMapValues));
@@ -277,5 +279,5 @@ namespace qtOWL {
     std::cout << "#qtOWL.XFEditor: saved transfer function to "
               <<  fileName << std::endl;
   }
-  
+
 }

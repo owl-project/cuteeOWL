@@ -28,7 +28,7 @@
 
 // eventually to go into 'apps/'
 #define STB_IMAGE_WRITE_IMPLEMENTATION 1
-#include "samples/common/3rdParty/stb/stb_image_write.h"
+#include "stb/stb_image_write.h"
 
 namespace qtOWL {
 
@@ -99,7 +99,7 @@ namespace qtOWL {
   {
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.start(1);
-    
+
     if (initWindowSize != vec2i(0))
       ((QWidget *)this)->resize(QSize(initWindowSize.x,initWindowSize.y));
   }
@@ -148,7 +148,7 @@ namespace qtOWL {
       cameraChanged();
       lastCameraUpdate = camera.lastModified;
     }
-    
+
     // call virtual render method that asks child class to render into
     // the fbPointer/frame buffer texture....
     render();
@@ -176,7 +176,7 @@ namespace qtOWL {
     }
     else
       special(event,where);
-    
+
     QWidget::keyPressEvent(event);
   }
 
@@ -192,7 +192,7 @@ namespace qtOWL {
   {
     const uint32_t *fb
       = (const uint32_t*)fbPointer;
-      
+
     std::vector<uint32_t> pixels;
     for (int y=0;y<fbSize.y;y++) {
       const uint32_t *line = fb + (fbSize.y-1-y)*fbSize.x;
@@ -204,7 +204,7 @@ namespace qtOWL {
                    pixels.data(),fbSize.x*sizeof(uint32_t));
     std::cout << "#owl.viewer: frame buffer written to " << fileName << std::endl;
   }
-      
+
   vec2i OWLViewer::getScreenSize()
   {
     QRect rec = QApplication::desktop()->screenGeometry();
@@ -212,7 +212,7 @@ namespace qtOWL {
     int width = rec.width();
     return {width, height};
   }
- 
+
   float computeStableEpsilon(float f)
   {
     return abs(f) * float(1./(1<<21));
@@ -224,7 +224,7 @@ namespace qtOWL {
                    computeStableEpsilon(v.y)),
                computeStableEpsilon(v.z));
   }
-    
+
   SimpleCamera::SimpleCamera(const Camera &camera)
   {
     auto &easy = *this;
@@ -254,7 +254,7 @@ namespace qtOWL {
       - 0.5f * easy.screen.horizontal;
     // easy.lastModified = getCurrentTime();
   }
-    
+
   // ==================================================================
   // actual viewerwidget class
   // ==================================================================
@@ -265,7 +265,7 @@ namespace qtOWL {
     if (fbPointer)
       cudaFree(fbPointer);
     cudaMallocManaged(&fbPointer,newSize.x*newSize.y*sizeof(uint32_t));
-      
+
     fbSize = newSize;
     // bool firstResize = false;
     if (fbTexture == 0) {
@@ -283,11 +283,11 @@ namespace qtOWL {
     // GL_CHECK(glActiveTexture(GL_TEXTURE0));
     GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newSize.x, newSize.y, 0, GL_RGBA,
                           GL_UNSIGNED_BYTE, nullptr));
-      
+
     // We need to re-register when resizing the texture
     cudaError_t rc = cudaGraphicsGLRegisterImage
       (&cuDisplayTexture, fbTexture, GL_TEXTURE_2D, 0);
-      
+
     // if (firstResize || !firstResize && resourceSharingSuccessful) {
     //   const char *forceSlowDisplay = getenv("OWL_NO_CUDA_RESOURCE_SHARING");
     bool forceSlowDisplay = false;
@@ -310,7 +310,7 @@ namespace qtOWL {
     setAspect(fbSize.x/float(fbSize.y));
   }
 
-    
+
   /*! re-draw the current frame. This function itself isn't
     virtual, but it calls the framebuffer's render(), which
     is */
@@ -318,7 +318,7 @@ namespace qtOWL {
   {
     if (resourceSharingSuccessful) {
       GL_CHECK(cudaGraphicsMapResources(1, &cuDisplayTexture));
-        
+
       cudaArray_t array;
       GL_CHECK(cudaGraphicsSubResourceGetMappedArray(&array, cuDisplayTexture, 0, 0));
       {
@@ -339,7 +339,7 @@ namespace qtOWL {
                                fbSize.x, fbSize.y,
                                GL_RGBA, GL_UNSIGNED_BYTE, fbPointer));
     }
-      
+
     glDisable(GL_LIGHTING);
     glColor3f(1, 1, 1);
 
@@ -350,7 +350,7 @@ namespace qtOWL {
     glBindTexture(GL_TEXTURE_2D, fbTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      
+
     glDisable(GL_DEPTH_TEST);
 
     glViewport(0, 0, fbSize.x, fbSize.y);
@@ -363,13 +363,13 @@ namespace qtOWL {
     {
       glTexCoord2f(0.f, 0.f);
       glVertex3f(0.f, 0.f, 0.f);
-      
+
       glTexCoord2f(0.f, 1.f);
       glVertex3f(0.f, (float)fbSize.y, 0.f);
-      
+
       glTexCoord2f(1.f, 1.f);
       glVertex3f((float)fbSize.x, (float)fbSize.y, 0.f);
-      
+
       glTexCoord2f(1.f, 0.f);
       glVertex3f((float)fbSize.x, 0.f, 0.f);
     }
@@ -486,7 +486,7 @@ namespace qtOWL {
     if (cameraManipulator) cameraManipulator->special(key,where);
   }
 
-  
+
   void OWLViewer::mousePressEvent(QMouseEvent *event)
   {
     const bool pressed = true;//(action == GLFW_PRESS);
@@ -516,7 +516,7 @@ namespace qtOWL {
     }
     // // lastPos = event->pos();
   }
-  
+
   void OWLViewer::mouseMoveEvent(QMouseEvent *event)
   {
     mouseMotion({event->x(),event->y()});
@@ -588,5 +588,5 @@ namespace qtOWL {
     camera.setOrientation(origin,interest,up,fovyInDegrees,false);
     updateCamera();
   }
-  
+
 }

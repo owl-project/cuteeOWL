@@ -23,12 +23,12 @@
 #include "QComboBox"
 // BorderLayout Sample
 
-#include "owlQT/OWLViewer.h"
-#include "owlQT/TransferFunctionEditor.h"
+#include "qtOWL/OWLViewer.h"
+#include "qtOWL/XFEditor.h"
 
-namespace owlQT {
-  struct SampleViewer : public owlQT::OWLViewer{
-  
+namespace qtOWL {
+  struct SampleViewer : public OWLViewer{
+
     void render() override
     {
       /* compute a simple test pattern ..... of course, we _should_ be
@@ -53,19 +53,19 @@ namespace owlQT {
         }
       cudaMemcpy(fbPointer,hostFB.data(),hostFB.size()*sizeof(int),cudaMemcpyDefault);
     }
-  
+
     void cameraChanged() override
     {
-      const owlQT::SimpleCamera camera = getSimplifiedCamera();
+      const SimpleCamera camera = getSimplifiedCamera();
     }
-  
+
   };
 
-  
+
   extern "C" int main(int argc, char **argv)
   {
     QApplication app(argc,argv);
-  
+
     SampleViewer viewer;
     viewer.show();
     const box3f worldBounds(vec3f(-1),vec3f(+1));
@@ -76,13 +76,13 @@ namespace owlQT {
     XFEditor    *xfEditor = new XFEditor;
     QFormLayout *layout   = new QFormLayout;
     layout->addWidget(xfEditor);
-    
+
     // Set QWidget as the central layout of the main window
     QMainWindow secondWindow;
     secondWindow.setCentralWidget(xfEditor);
-      
+
     secondWindow.show();
-  
+
     return app.exec();
   }
 
