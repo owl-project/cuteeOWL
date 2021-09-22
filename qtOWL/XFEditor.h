@@ -32,7 +32,7 @@ namespace qtOWL {
   using namespace owl::common;
 
   struct XFEditor;
-  
+
   typedef interval<float> range1f;
 
   /*! main transfer function editor widget: a widget with an alpha
@@ -43,19 +43,20 @@ namespace qtOWL {
     Q_OBJECT
 
   public:
+    XFEditor();
     /*! construct a new xf editor widget around the given 'domain'
         (ie, range of valid inputs) of a scalar field. */
     XFEditor(const range1f &domain);
 
     const ColorMap &getColorMap() const;
-    
+
     /*! load either a transfer function written with saveTo(), or
         whole RGBA maps from a png file */
     void loadFrom(const std::string &fileName);
-    
+
     /*! dump entire transfer function to file */
     void saveTo(const std::string &fileName);
-    
+
   signals:
     /*! the color map (in the alpha editor) got changed; either
         because the user drew in it, or selected anothe ron from the
@@ -78,12 +79,12 @@ namespace qtOWL {
     void emitAbsRangeChanged(const QString &);
     /*! gets called by the relative domain double spinners */
     void emitRelRangeChanged(double);
-    
+
   public:
     /* both different rangeChanged() signals route to this one
        implementaion, since type doesn't matter */
     void signal_rangeChanged();
-    
+
   private:
     ColorMapLibrary colorMaps;
     AlphaEditor    *alphaEditor;
@@ -94,7 +95,7 @@ namespace qtOWL {
     QDoubleSpinBox *rel_domain_lower;
     QDoubleSpinBox *rel_domain_upper;
     QDoubleSpinBox *opacityScaleSpinBox;
-    range1f         dataValueRange;
+    range1f         dataValueRange{0.f, 1.f};
   };
 
 }

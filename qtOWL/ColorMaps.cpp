@@ -17,10 +17,10 @@
 #include "qtOWL/ColorMaps.h"
 
 #define STB_IMAGE_IMPLEMENTATION 1
-#include "samples/common/3rdParty/stb/stb_image.h"
+#include "stb/stb_image.h"
 
 namespace qtOWL {
-  
+
   uint8_t paraview_cool_warm[]
   = {
      0x89,0x50,0x4e,0x47,0xd,0xa,0x1a,0xa,0x0,0x0,0x0,0xd,0x49,0x48,
@@ -232,14 +232,14 @@ namespace qtOWL {
     for (auto cm : knownMaps) result.push_back(cm.first);
     return result;
   }
-  
-  
+
+
   /*! return map with given index */
   const ColorMap &ColorMapLibrary::getMap(const int mapID) const
   {
     return knownMaps[mapID % knownMaps.size()].second;
   }
-    
+
   /*! return _name_ of map with given index */
   const std::string &ColorMapLibrary::getMapName(const int mapID) const
   {
@@ -261,19 +261,19 @@ namespace qtOWL {
     }
     return result;
   }
-  
-  
+
+
   ColorMapLibrary::ColorMapLibrary()
   {
     loadDefaults();
   }
-  
+
   void ColorMapLibrary::loadDefaults(int numSamplesPerMap)
   {
     // ColorMapLibrary result;
 #define ADDCM(name)                                                     \
     knownMaps.push_back({std::string(#name),                     \
-                                ColorMap::fromPNG(name,sizeof(name))})    
+                                ColorMap::fromPNG(name,sizeof(name))})
 
     ADDCM(paraview_cool_warm);
     ADDCM(rainbow);
@@ -292,7 +292,7 @@ namespace qtOWL {
     ADDCM(jamie_draft);
     ADDCM(hsv);
     ADDCM(gray);
-    
+
 #undef ADDCM
 
     for (auto &map : knownMaps)

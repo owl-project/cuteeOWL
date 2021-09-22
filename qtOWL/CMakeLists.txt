@@ -14,20 +14,14 @@
 # limitations under the License.                                           #
 # ======================================================================== #
 
-if (POLICY CMP0072)
-  cmake_policy(SET CMP0072 NEW)
-endif()
-
-# Tell CMake to run moc when necessary:
-set(CMAKE_AUTOMOC ON)
-# As moc files are generated in the binary dir, tell CMake
-# to always look for includes there:
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-include_directories(${OWL_INCLUDES})
+set(OpenGL_GL_PREFERENCE "LEGACY")
 find_package(OpenGL REQUIRED)
-find_package(CUDA REQUIRED)
-add_library(qtOWL STATIC
+
+find_package(Qt5Widgets REQUIRED)
+set(CMAKE_AUTOMOC ON)
+
+add_library(qtOWL STATIC)
+target_sources(qtOWL PRIVATE
   OWLViewer.cpp
   InspectMode.cpp
   FlyMode.cpp
@@ -41,20 +35,6 @@ add_library(qtOWL STATIC
 
   ColorMaps.h
   ColorMaps.cpp
-  )
-target_link_libraries(qtOWL
-  ${OPENGL_opengl_LIBRARY}
-  ${CUDA_CUDA_LIBRARY}
-  ${CUDA_CUDART_LIBRARY}
-  )
-qt5_use_modules(qtOWL
-  Widgets
-  )
-
-set(QT_OWL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/.. ${OWL_INCLUDES} PARENT_SCOPE)
-set(QT_OWL_LIBRARIES qtOWL PARENT_SCOPE)
-  
-macro(QT_OWL_LINK target)
-  target_link_libraries(${target} ${QT_OWL_LIBRARIES})
-  qt5_use_modules(${target} Widgets)
-endmacro()
+)
+target_link_libraries(qtOWL PUBLIC owl::owl Qt5::Widgets stb_image OpenGL::GL)
+target_include_directories(qtOWL PUBLIC ${CMAKE_CURRENT_LIST_DIR}/..)
