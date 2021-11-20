@@ -25,8 +25,10 @@ project(Cutee-OWL VERSION 0.0.1)
 # ------------------------------------------------------------------
 # add owl, for vec3f stuff used in viewer
 # ------------------------------------------------------------------
-set(owl_dir ${CMAKE_SOURCE_DIR}/../owl)
-add_subdirectory(${owl_dir} external_owl EXCLUDE_FROM_ALL)
+if (NOT TARGET owl::owl)
+  set(owl_dir ${CMAKE_SOURCE_DIR}/../owl)
+  add_subdirectory(${owl_dir} external_owl EXCLUDE_FROM_ALL)
+endif()
 
 # ------------------------------------------------------------------
 # the owlQT library with viewer widget etc
