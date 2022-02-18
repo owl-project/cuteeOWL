@@ -205,7 +205,7 @@ namespace qtOWL {
       app that the camera got changed */
     void updateCamera();
 
-    void showAndRun();
+    // void showAndRun();
       
     void mouseButton(int button, int action, int mods);
       

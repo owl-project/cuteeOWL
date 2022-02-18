@@ -40,14 +40,14 @@ add_subdirectory(qtOWL)
 # ------------------------------------------------------------------
 
 
-find_package(Qt5Widgets REQUIRED)
-get_property(core_options TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS)
-string(REPLACE "-fPIC" "" new_core_options ${core_options})
-set_property(TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options})
-set_property(TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
-
 
 add_executable(sampleViewer apps/sample.cpp)
 target_link_libraries(sampleViewer PRIVATE qtOWL)
+
+
+
+
+
+
 
 
