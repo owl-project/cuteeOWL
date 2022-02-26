@@ -94,8 +94,9 @@ namespace qtOWL {
     QLineEdit      *abs_domain_upper;
     QDoubleSpinBox *rel_domain_lower;
     QDoubleSpinBox *rel_domain_upper;
-    QDoubleSpinBox *opacityScaleSpinBox;
     range1f         dataValueRange{0.f, 1.f};
+  public:
+    QDoubleSpinBox *opacityScaleSpinBox;
   };
 
 }
