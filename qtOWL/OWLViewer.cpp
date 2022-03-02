@@ -290,7 +290,12 @@ namespace qtOWL {
 
     // if (firstResize || !firstResize && resourceSharingSuccessful) {
     //   const char *forceSlowDisplay = getenv("OWL_NO_CUDA_RESOURCE_SHARING");
+#if CUTEEOWL_FORCE_SLOW_DISPLAY
+# pragma message("forcing slow display in qt-owl viewer!")
+    bool forceSlowDisplay = true;
+#else
     bool forceSlowDisplay = false;
+#endif
     if (rc != cudaSuccess || forceSlowDisplay) {
       std::cout << OWL_TERMINAL_RED
                 << "Warning: Could not do CUDA graphics resource sharing "
