@@ -48,8 +48,6 @@ namespace qtOWL {
         (ie, range of valid inputs) of a scalar field. */
     XFEditor(const range1f &domain);
 
-    const ColorMap &getColorMap() const;
-
     /*! load either a transfer function written with saveTo(), or
         whole RGBA maps from a png file */
     void loadFrom(const std::string &fileName);
@@ -85,6 +83,16 @@ namespace qtOWL {
        implementaion, since type doesn't matter */
     void signal_rangeChanged();
 
+    // for saving/restoring all editor fields:
+    range1f getAbsDomain() const;
+    range1f getRelDomain() const;
+    float   getOpacityScale() const;
+    const ColorMap &getColorMap() const;
+
+    void setColorMap(const std::vector<vec4f> &cm);
+    void setAbsDomain(const range1f &range);
+    void setRelDomain(const range1f &range);
+    void setOpacityScale(float value);
   private:
     ColorMapLibrary colorMaps;
     AlphaEditor    *alphaEditor;
@@ -95,7 +103,6 @@ namespace qtOWL {
     QDoubleSpinBox *rel_domain_lower;
     QDoubleSpinBox *rel_domain_upper;
     range1f         dataValueRange{0.f, 1.f};
-  public:
     QDoubleSpinBox *opacityScaleSpinBox;
   };
 

@@ -83,13 +83,18 @@ namespace qtOWL {
     // opacity scale
     // -------------------------------------------------------
     opacityScaleSpinBox = new QDoubleSpinBox;
+    // opacityScaleSpinBox->setDecimals(3);
+    // opacityScaleSpinBox->setValue(1.f);
+    // opacityScaleSpinBox->setRange(0.f,1.f);
+    // opacityScaleSpinBox->setSingleStep(.03f);
     opacityScaleSpinBox->setDecimals(3);
-    opacityScaleSpinBox->setValue(1.f);
-    opacityScaleSpinBox->setRange(0.f,1.f);
-    opacityScaleSpinBox->setSingleStep(.03f);
+    opacityScaleSpinBox->setSingleStep(1.f);
+    opacityScaleSpinBox->setRange(0.f,200.f);
+    opacityScaleSpinBox->setValue(100.f);
     gridLayout->addWidget(new QLabel("opacity scale"),3,0);
     gridLayout->addWidget(opacityScaleSpinBox,3,1);
 
+    
     // opacityScaleLayout->addWidget(new QLabel("Opacity scale"),0,0);
     // opacityScaleLayout->addWidget(opacityScaleSpinBox);
     // QWidget *opacityScaleWidget = new QWidget;
@@ -187,6 +192,60 @@ namespace qtOWL {
     return alphaEditor->getColorMap();
   }
 
+  range1f XFEditor::getAbsDomain() const
+  {
+    range1f absRange(abs_domain_lower->text().toDouble(),
+                     abs_domain_upper->text().toDouble());
+    absRange = order(absRange);
+    return absRange;
+  }
+  
+  range1f XFEditor::getRelDomain() const
+  {
+    range1f relRange(rel_domain_lower->text().toDouble(),
+                     rel_domain_upper->text().toDouble());
+    relRange = order(relRange);
+    return relRange;
+  }
+  
+  float   XFEditor::getOpacityScale() const
+  {
+    return opacityScaleSpinBox->value();
+  }
+
+  void XFEditor::setOpacityScale(float v) 
+  {
+    return opacityScaleSpinBox->setValue(v);
+  }
+
+  void XFEditor::setColorMap(const std::vector<vec4f> &cm) 
+  {
+    ColorMap colorMap;
+    for (auto v : cm) colorMap.push_back(v);
+    alphaEditor->setColorMap(colorMap,AlphaEditor::OVERWRITE_ALPHA);
+  }
+
+  void XFEditor::setAbsDomain(const range1f &r) 
+  {
+    // range1f absRange(abs_domain_lower->text().toDouble(),
+    //                  abs_domain_upper->text().toDouble());
+    // absRange = order(absRange);
+    abs_domain_lower->setText(QString::number(r.lower));
+    abs_domain_upper->setText(QString::number(r.upper));
+  }
+  
+  void XFEditor::setRelDomain(const range1f &r) 
+  {
+    // range1f relRange(rel_domain_lower->text().toDouble(),
+    //                  rel_domain_upper->text().toDouble());
+    // relRange = order(relRange);
+    rel_domain_lower->setValue(r.lower);
+    rel_domain_upper->setValue(r.upper);
+  }
+
+  
+
+
   static const size_t xfFileFormatMagic = 0x1235abc000;
   /*! load either a transfer function written with saveTo(), or
       whole RGBA maps from a png file */
@@ -280,4 +339,5 @@ namespace qtOWL {
               <<  fileName << std::endl;
   }
 
+  
 }
