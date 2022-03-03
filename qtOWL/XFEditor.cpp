@@ -148,6 +148,8 @@ namespace qtOWL {
   {
     //colorMapChangedCB(&ae->xf);
     emit colorMapChanged(this);
+    emit opacityScaleChanged(getOpacityScale());
+    emit signal_rangeChanged();
   }
 
   inline range1f order(const range1f v)
@@ -232,6 +234,7 @@ namespace qtOWL {
     // absRange = order(absRange);
     abs_domain_lower->setText(QString::number(r.lower));
     abs_domain_upper->setText(QString::number(r.upper));
+    signal_rangeChanged();
   }
   
   void XFEditor::setRelDomain(const range1f &r) 
@@ -241,6 +244,7 @@ namespace qtOWL {
     // relRange = order(relRange);
     rel_domain_lower->setValue(r.lower);
     rel_domain_upper->setValue(r.upper);
+    signal_rangeChanged();
   }
 
   
