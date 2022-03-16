@@ -45,12 +45,12 @@ namespace qtOWL {
     // absolute xf domain (editable, no spinners, absolute values)
     // -------------------------------------------------------
     abs_domain_lower = new QLineEdit;
-    abs_domain_lower->setValidator(new QDoubleValidator(domain.lower,domain.upper,0));
+    abs_domain_lower->setValidator(new QDoubleValidator(domain.lower,domain.upper,3));
     abs_domain_lower->setText(QString::number(domain.lower));
     gridLayout->addWidget(abs_domain_lower,1,1);
 
     abs_domain_upper = new QLineEdit;
-    abs_domain_upper->setValidator(new QDoubleValidator(domain.lower,domain.upper,0));
+    abs_domain_upper->setValidator(new QDoubleValidator(domain.lower,domain.upper,3));
     abs_domain_upper->setText(QString::number(domain.upper));
     gridLayout->addWidget(abs_domain_upper,1,2);
 
