@@ -25,8 +25,7 @@
 #include <QApplication>
 #include <QMainWindow>
 
-#include <cuda_runtime.h>
-#include <cuda_gl_interop.h>
+typedef struct cudaGraphicsResource* cudaGraphicsResource_t;
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
