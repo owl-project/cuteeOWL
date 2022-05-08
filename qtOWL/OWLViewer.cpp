@@ -26,6 +26,11 @@
 #include "FlyMode.h"
 #include <sstream>
 
+#if CUTEEOWL_USE_CUDA
+#include <cuda_runtime.h>
+#include <cuda_gl_interop.h>
+#endif
+
 // eventually to go into 'apps/'
 #define STB_IMAGE_WRITE_IMPLEMENTATION 1
 #include "stb/stb_image_write.h"
@@ -262,9 +267,16 @@ namespace qtOWL {
   void OWLViewer::resize(const vec2i &newSize)
   {
     // glfwMakeContextCurrent(handle);
+#if CUTEEOWL_USE_CUDA
     if (fbPointer)
       cudaFree(fbPointer);
     cudaMallocManaged(&fbPointer,newSize.x*newSize.y*sizeof(uint32_t));
+#else
+# pragma message("not building with CUDA toolkit, frame buffer allocated in host memory!")
+    if (fbPointer)
+      delete[] fbPointer;
+    fbPointer = new uint32_t[newSize.x*newSize.y];
+#endif
 
     fbSize = newSize;
     // bool firstResize = false;
@@ -273,10 +285,12 @@ namespace qtOWL {
       // firstResize = true;
     }
     else {
+#if CUTEEOWL_USE_CUDA
       if (cuDisplayTexture) {
         cudaGraphicsUnregisterResource(cuDisplayTexture);
         cuDisplayTexture = 0;
       }
+#endif
     }
 
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
@@ -284,9 +298,11 @@ namespace qtOWL {
     GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newSize.x, newSize.y, 0, GL_RGBA,
                           GL_UNSIGNED_BYTE, nullptr));
 
+#if CUTEEOWL_USE_CUDA
     // We need to re-register when resizing the texture
     cudaError_t rc = cudaGraphicsGLRegisterImage
       (&cuDisplayTexture, fbTexture, GL_TEXTURE_2D, 0);
+#endif
 
     // if (firstResize || !firstResize && resourceSharingSuccessful) {
     //   const char *forceSlowDisplay = getenv("OWL_NO_CUDA_RESOURCE_SHARING");
@@ -296,6 +312,8 @@ namespace qtOWL {
 #else
     bool forceSlowDisplay = false;
 #endif
+
+#if CUTEEOWL_USE_CUDA
     if (rc != cudaSuccess || forceSlowDisplay) {
       std::cout << OWL_TERMINAL_RED
                 << "Warning: Could not do CUDA graphics resource sharing "
@@ -312,6 +330,9 @@ namespace qtOWL {
     } else {
       resourceSharingSuccessful = true;
     }
+#else
+    resourceSharingSuccessful = false;
+#endif
     setAspect(fbSize.x/float(fbSize.y));
   }
 
@@ -322,6 +343,7 @@ namespace qtOWL {
   void OWLViewer::draw()
   {
     if (resourceSharingSuccessful) {
+#if CUTEEOWL_USE_CUDA
       GL_CHECK(cudaGraphicsMapResources(1, &cuDisplayTexture));
 
       cudaArray_t array;
@@ -336,6 +358,7 @@ namespace qtOWL {
                             fbSize.y,
                             cudaMemcpyDeviceToDevice);
       }
+#endif
     } else {
       GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
       glEnable(GL_TEXTURE_2D);
@@ -379,9 +402,11 @@ namespace qtOWL {
       glVertex3f((float)fbSize.x, 0.f, 0.f);
     }
     glEnd();
+#if CUTEEOWL_USE_CUDA
     if (resourceSharingSuccessful) {
       GL_CHECK(cudaGraphicsUnmapResources(1, &cuDisplayTexture));
     }
+#endif
   }
 
   /*! re-computes the 'camera' from the 'cameracontrol', and notify

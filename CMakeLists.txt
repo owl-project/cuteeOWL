@@ -22,6 +22,11 @@ endif()
 
 project(Cutee-OWL VERSION 0.0.1)
 
+option(CUTEEOWL_USE_CUDA "Build with CUDA frame buffer implementation" ON)
+if(CUTEEOWL_USE_CUDA)
+  find_package(CUDAToolkit)
+endif()
+
 # ------------------------------------------------------------------
 # add owl, for vec3f stuff used in viewer
 # ------------------------------------------------------------------
@@ -41,8 +46,10 @@ add_subdirectory(qtOWL)
 
 
 
-add_executable(sampleViewer apps/sample.cpp)
-target_link_libraries(sampleViewer PRIVATE qtOWL)
+if(CUDAToolkit_FOUND)
+  add_executable(sampleViewer apps/sample.cpp)
+  target_link_libraries(sampleViewer PRIVATE qtOWL)
+endif()
 
 
 

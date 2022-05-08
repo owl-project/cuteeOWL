@@ -44,5 +44,9 @@ target_sources(qtOWL PRIVATE
   ColorMaps.h
   ColorMaps.cpp
 )
-target_link_libraries(qtOWL PUBLIC owl::owl Qt5::Widgets stb_image OpenGL::GL)
+target_link_libraries(qtOWL PUBLIC owl::owl Qt5::Widgets OpenGL::GL)
 target_include_directories(qtOWL PUBLIC ${CMAKE_CURRENT_LIST_DIR}/..)
+if(CUDAToolkit_FOUND)
+  target_link_libraries(qtOWL PUBLIC CUDA::cudart)
+  target_compile_definitions(qtOWL PUBLIC CUTEEOWL_USE_CUDA=1)
+endif()
