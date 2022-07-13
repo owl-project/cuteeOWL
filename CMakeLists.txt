@@ -22,9 +22,15 @@ endif()
 
 project(Cutee-OWL VERSION 0.0.1)
 
-option(CUTEEOWL_USE_CUDA "Build with CUDA frame buffer implementation" ON)
-if(CUTEEOWL_USE_CUDA)
-  find_package(CUDAToolkit)
+#option(CUTEEOWL_USE_CUDA "Build with CUDA frame buffer implementation" ON)
+#if(CUTEEOWL_USE_CUDA)
+#  find_package(CUDAToolkit)
+#endif()
+
+if (NOT (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR}))
+  set(CUTEE_OWL_IS_SUBPROJECT ON)
+else()
+  set(CUTEE_OWL_IS_SUBPROJECT OFF)
 endif()
 
 # ------------------------------------------------------------------
@@ -35,6 +41,23 @@ if (NOT TARGET owl::owl)
   add_subdirectory(${owl_dir} external_owl EXCLUDE_FROM_ALL)
 endif()
 
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# iw - remove QT's hardcoded "-fPIC" from the target compile options, because
+# this will cause issues when later 'linking' this target (via linking to qtOWL)
+# to targets that get compiled with other compilers such as nvcc (which do not
+# understand this target). Proper way is to remove this hardcoded flag here,
+# and in the 'real' app set the POSITION_INDEPENDENT_CODE flag to on, as well
+# as set CMAKE_CXX_COMPILE_OPTIONS_PIE to "-fPIC" for those targets that
+# actually use a C++ compiler that understands this.
+find_package(Qt5Widgets REQUIRED)
+get_property(core_options TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS)
+string(REPLACE "-fPIC" "" new_core_options ${core_options})
+set_property(TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options})
+set_property(TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
+  
+
 # ------------------------------------------------------------------
 # the owlQT library with viewer widget etc
 # ------------------------------------------------------------------
@@ -44,12 +67,15 @@ add_subdirectory(qtOWL)
 # sample app(s)
 # ------------------------------------------------------------------
 
-
-
-if(CUDAToolkit_FOUND)
+IF (NOT CUTEE_OWL_IS_SUBPROJECT)
+  set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
+  enable_language(CUDA)
+  
   add_executable(sampleViewer apps/sample.cpp)
-  target_link_libraries(sampleViewer PRIVATE qtOWL)
+  set_property(TARGET sampleViewer PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
+  target_link_libraries(sampleViewer PRIVATE qtOWL  Qt5::Widgets)
 endif()
+#endif()
 
 
 

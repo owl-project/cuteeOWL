@@ -26,6 +26,10 @@
 #include "qtOWL/OWLViewer.h"
 #include "qtOWL/XFEditor.h"
 
+#include <cuda_runtime.h>
+//#include <cuda_gl_interop.h>
+
+
 namespace qtOWL {
   struct SampleViewer : public OWLViewer{
 
