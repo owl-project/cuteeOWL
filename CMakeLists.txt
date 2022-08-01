@@ -53,8 +53,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # actually use a C++ compiler that understands this.
 find_package(Qt5Widgets REQUIRED)
 get_property(core_options TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS)
+if(${core_options})
 string(REPLACE "-fPIC" "" new_core_options ${core_options})
 set_property(TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options})
+endif()
 set_property(TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
   
 
