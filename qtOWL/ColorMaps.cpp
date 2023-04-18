@@ -17,7 +17,7 @@
 #include "qtOWL/ColorMaps.h"
 
 #define STB_IMAGE_IMPLEMENTATION 1
-#include "samples/common/3rdParty/stb/stb_image.h"
+#include "stb/stb_image.h"
 
 namespace qtOWL {
   

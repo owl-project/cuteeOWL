@@ -28,7 +28,8 @@
 
 // eventually to go into 'apps/'
 #define STB_IMAGE_WRITE_IMPLEMENTATION 1
-#include "samples/common/3rdParty/stb/stb_image_write.h"
+#include "stb/stb_image_write.h"
+// #include "samples/common/3rdParty/stb/stb_image_write.h"
 
 namespace qtOWL {
 

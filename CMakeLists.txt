@@ -41,7 +41,7 @@ endif()
 # ------------------------------------------------------------------
 # the owlQT library with viewer widget etc
 # ------------------------------------------------------------------
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(qtOWL)
 
 
@@ -52,7 +52,7 @@ add_subdirectory(qtOWL)
 # Tell CMake to run moc when necessary:
 set(CMAKE_AUTOMOC ON)
 
-include_directories(${QT_OWL_INCLUDES})
+#include_directories(${QT_OWL_INCLUDES})
 
 add_executable(sampleViewer
   apps/sample.cpp
