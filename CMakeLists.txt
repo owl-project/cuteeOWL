@@ -29,7 +29,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # ------------------------------------------------------------------
 # add owl, for vec3f stuff used in viewer
 # ------------------------------------------------------------------
-if (NOT (TARGET owl_static))
+if (NOT (TARGET owl))
   message(FATAL "owl hasn't been included yet...")
 #  set(owl_dir ${CMAKE_CURRENT_SOURCE_DIR}/../owl)
 #  add_subdirectory(${owl_dir} external_owl EXCLUDE_FROM_ALL)
