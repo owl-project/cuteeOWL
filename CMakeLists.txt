@@ -30,11 +30,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # add owl, for vec3f stuff used in viewer
 # ------------------------------------------------------------------
 if (NOT (TARGET owl_static))
-  message("owl hasn't been included yet...")
-  set(owl_dir ${CMAKE_CURRENT_SOURCE_DIR}/../owl)
-  add_subdirectory(${owl_dir} external_owl EXCLUDE_FROM_ALL)
-  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${owl_dir}/owl/cmake/")
-  include(configure_build_type)
+  message(FATAL "owl hasn't been included yet...")
+#  set(owl_dir ${CMAKE_CURRENT_SOURCE_DIR}/../owl)
+#  add_subdirectory(${owl_dir} external_owl EXCLUDE_FROM_ALL)
+#  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${owl_dir}/owl/cmake/")
+#  include(configure_build_type)
 endif()
 
 

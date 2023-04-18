@@ -24,9 +24,9 @@ set(CMAKE_AUTOMOC ON)
 # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-include_directories(${OWL_INCLUDES})
-find_package(OpenGL REQUIRED)
-find_package(CUDA REQUIRED)
+#include_directories(${OWL_INCLUDES})
+#find_package(OpenGL REQUIRED)
+#find_package(CUDA REQUIRED)
 add_library(qtOWL STATIC
   OWLViewer.cpp
   InspectMode.cpp
@@ -42,9 +42,10 @@ add_library(qtOWL STATIC
   ColorMaps.cpp
   )
 target_link_libraries(qtOWL
-  ${OPENGL_opengl_LIBRARY}
-  ${CUDA_CUDA_LIBRARY}
-  ${CUDA_CUDART_LIBRARY}
+#  ${OPENGL_opengl_LIBRARY}
+#  ${CUDA_CUDA_LIBRARY}
+#  ${CUDA_CUDART_LIBRARY}
+owl::owl 
   )
 qt5_use_modules(qtOWL
   Widgets
