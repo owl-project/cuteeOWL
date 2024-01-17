@@ -448,12 +448,17 @@ namespace qtOWL {
     _moved_ to the given position */
   void OWLViewer::mouseMotion(const vec2i &newMousePosition)
   {
+    if (lastMousePosition == newMousePosition) return;
+    
     if (lastMousePosition != vec2i(-1)) {
-      if (leftButton.isPressed)
-        mouseDragLeft  (newMousePosition,newMousePosition-lastMousePosition);
-      if (centerButton.isPressed)
+      if (leftButton.isPressed && leftButton.ctrlWhenPressed)
+        // let left-plus-ctrl emulate center
         mouseDragCenter(newMousePosition,newMousePosition-lastMousePosition);
-      if (rightButton.isPressed)
+      else if (leftButton.isPressed)
+        mouseDragLeft  (newMousePosition,newMousePosition-lastMousePosition);
+      else if (centerButton.isPressed)
+        mouseDragCenter(newMousePosition,newMousePosition-lastMousePosition);
+      else if (rightButton.isPressed)
         mouseDragRight (newMousePosition,newMousePosition-lastMousePosition);
     }
     lastMousePosition = newMousePosition;
@@ -521,9 +526,15 @@ namespace qtOWL {
   {
     const bool pressed = true;//(action == GLFW_PRESS);
     lastMousePos = getMousePos();
+        //Do stuff
+
     switch(event->button()) {
     case Qt::LeftButton://GLFW_MOUSE_BUTTON_LEFT:
       leftButton.isPressed        = pressed;
+      leftButton.shiftWhenPressed
+        = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+      leftButton.ctrlWhenPressed
+        = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
       // leftButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
       // leftButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
       // leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
