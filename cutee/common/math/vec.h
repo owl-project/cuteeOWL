@@ -32,7 +32,7 @@ namespace cutee {
     template<> struct long_type_of<uint32_t> { typedef uint64_t type; };
   
     template<typename T, int N>
-    struct QTOWL_INTERFACE vec_t { T t[N]; };
+    struct CUTEE_INTERFACE vec_t { T t[N]; };
 
 
     template<typename ScalarTypeA, typename ScalarTypeB> struct BinaryOpResultType;
@@ -56,29 +56,29 @@ namespace cutee {
     // vector, so we can use it in, say, box1f
     // ------------------------------------------------------------------
     template<typename T>
-    struct QTOWL_INTERFACE vec_t<T,1> {
+    struct CUTEE_INTERFACE vec_t<T,1> {
       enum { dims = 1 };
       typedef T scalar_t;
     
-      inline __both__ vec_t() {}
-      inline __both__ vec_t(const T &v) : v(v) {}
+      inline vec_t() {}
+      inline vec_t(const T &v) : v(v) {}
 
       /*! assignment operator */
-      inline __both__ vec_t<T,1> &operator=(const vec_t<T,1> &other) {
+      inline vec_t<T,1> &operator=(const vec_t<T,1> &other) {
         this->v = other.v;
         return *this;
       }
     
       /*! construct 2-vector from 2-vector of another type */
       template<typename OT>
-        inline __both__ explicit vec_t(const vec_t<OT,1> &o) : v(o.v) {}
+        inline explicit vec_t(const vec_t<OT,1> &o) : v(o.v) {}
     
-      inline __both__ T &operator[](size_t dim) {
+      inline T &operator[](size_t dim) {
         assert(dim == 0);
         return x;
         // return (&x)[dim];
       }
-      inline __both__ const T &operator[](size_t dim) const
+      inline const T &operator[](size_t dim) const
       {
         assert(dim == 0);
         return x;
@@ -95,30 +95,16 @@ namespace cutee {
     // vec2
     // ------------------------------------------------------------------
     template<typename T>
-    struct QTOWL_INTERFACE vec_t<T,2> {
+    struct CUTEE_INTERFACE vec_t<T,2> {
       enum { dims = 2 };
       typedef T scalar_t;
     
-      inline __both__ vec_t() {}
-      inline __both__ vec_t(const T &t) : x(t), y(t) {}
-      inline __both__ vec_t(const T &x, const T &y) : x(x), y(y) {}
-#ifdef __CUDACC__
-      inline __both__ vec_t(const float2 v) : x(v.x), y(v.y) {}
-      inline __both__ vec_t(const int2 v) : x(v.x), y(v.y) {}
-      inline __both__ vec_t(const uint2 v) : x(v.x), y(v.y) {}
-    
-      inline __both__ operator float2() const { return make_float2(x,y); }
-      inline __both__ operator int2() const { return make_int2(x,y); }
-      inline __both__ operator uint2() const { return make_uint2(x,y); }
-
-      /*! auto-convert to cuda dim3 type, so we can use vec2is as
-        paramters to kernel launches */
-      inline __both__ operator dim3() const { dim3 d; d.x = x; d.y = y; d.z = 1; return d; }
-      inline explicit __both__ vec_t(const dim3 v) : x(v.x), y(v.y) {}
-#endif
+      inline vec_t() {}
+      inline vec_t(const T &t) : x(t), y(t) {}
+      inline vec_t(const T &x, const T &y) : x(x), y(y) {}
 
       /*! assignment operator */
-      inline __both__ vec_t<T,2> &operator=(const vec_t<T,2> &other) {
+      inline vec_t<T,2> &operator=(const vec_t<T,2> &other) {
         this->x = other.x;
         this->y = other.y;
         return *this;
@@ -126,10 +112,10 @@ namespace cutee {
     
       /*! construct 2-vector from 2-vector of another type */
       template<typename OT>
-        inline __both__ explicit vec_t(const vec_t<OT,2> &o) : x((T)o.x), y((T)o.y) {}
+        inline explicit vec_t(const vec_t<OT,2> &o) : x((T)o.x), y((T)o.y) {}
     
-      inline __both__ T &operator[](size_t dim) { return (&x)[dim]; }
-      inline __both__ const T &operator[](size_t dim) const { return (&x)[dim]; }
+      inline T &operator[](size_t dim) { return (&x)[dim]; }
+      inline const T &operator[](size_t dim) const { return (&x)[dim]; }
     
       union {
         struct { T x, y; };
@@ -142,56 +128,36 @@ namespace cutee {
     // vec3
     // ------------------------------------------------------------------
     template<typename T>
-    struct QTOWL_INTERFACE vec_t<T,3> {
+    struct CUTEE_INTERFACE vec_t<T,3> {
       enum { dims = 3 };
       typedef T scalar_t;
     
-      inline // __both__
+      inline //
         vec_t(const vec_t &) = default;
-      inline __both__ vec_t() {}
-      inline __both__ vec_t(const T &t) : x(t), y(t), z(t) {}
-      inline __both__ vec_t(const T &_x, const T &_y, const T &_z) : x(_x), y(_y), z(_z) {}
-#ifdef __CUDACC__
-      inline __both__ vec_t(const int3 &v)   : x(v.x), y(v.y), z(v.z) {}
-      inline __both__ vec_t(const uint3 &v)  : x(v.x), y(v.y), z(v.z) {}
-      inline __both__ vec_t(const float3 &v) : x(v.x), y(v.y), z(v.z) {}
-      /*! initialize from a float4 - use an actual copy rather than
-          const-ref here to force nvcc to actually do the full float4
-          load if tihs is from memory */
-      inline __both__ vec_t(const float4 v)  : x(v.x), y(v.y), z(v.z) {}
-      /*! initialize from a int4 - use an actual copy rather than
-          const-ref here to force nvcc to actually do the full float4
-          load if tihs is from memory */
-      inline __both__ vec_t(const int4 v)  : x(v.x), y(v.y), z(v.z) {}
-      /*! initialize from a uint4 - use an actual copy rather than
-          const-ref here to force nvcc to actually do the full float4
-          load if tihs is from memory */
-      inline __both__ vec_t(const uint4 v)  : x(v.x), y(v.y), z(v.z) {}
-      inline __both__ operator float3() const { return make_float3(x,y,z); }
-      inline __both__ operator int3() const { return make_int3(x,y,z); }
-      inline __both__ operator uint3() const { return make_uint3(x,y,z); }
-#endif
-      inline __both__ explicit vec_t(const vec_t<T,4> &v);
+      inline vec_t() {}
+      inline vec_t(const T &t) : x(t), y(t), z(t) {}
+      inline vec_t(const T &_x, const T &_y, const T &_z) : x(_x), y(_y), z(_z) {}
+      inline explicit vec_t(const vec_t<T,4> &v);
       /*! construct 3-vector from 3-vector of another type */
       template<typename OT>
-        inline __both__ explicit vec_t(const vec_t<OT,3> &o) : x((T)o.x), y((T)o.y), z((T)o.z) {}
+        inline explicit vec_t(const vec_t<OT,3> &o) : x((T)o.x), y((T)o.y), z((T)o.z) {}
 
       /*! swizzle ... */
-      inline __both__ vec_t<T,3> yzx() const { return vec_t<T,3>(y,z,x); }
+      inline vec_t<T,3> yzx() const { return vec_t<T,3>(y,z,x); }
     
       /*! assignment operator */
-      inline __both__ vec_t<T,3> &operator=(const vec_t<T,3> &other) {
+      inline vec_t<T,3> &operator=(const vec_t<T,3> &other) {
         this->x = other.x;
         this->y = other.y;
         this->z = other.z;
         return *this;
       }
     
-      inline __both__ T &operator[](size_t dim) { return (&x)[dim]; }
-      inline __both__ const T &operator[](size_t dim) const { return (&x)[dim]; }
+      inline T &operator[](size_t dim) { return (&x)[dim]; }
+      inline const T &operator[](size_t dim) const { return (&x)[dim]; }
 
       template<typename OT, typename Lambda>
-        static inline __both__ vec_t<T,3> make_from(const vec_t<OT,3> &v, const Lambda &lambda)
+        static inline vec_t<T,3> make_from(const vec_t<OT,3> &v, const Lambda &lambda)
       { return vec_t<T,3>(lambda(v.x),lambda(v.y),lambda(v.z)); }
     
       union {
@@ -205,18 +171,10 @@ namespace cutee {
     // vec3a
     // ------------------------------------------------------------------
     template<typename T>
-    struct QTOWL_INTERFACE QTOWL_ALIGN(16) vec3a_t : public vec_t<T,3> {
+    struct CUTEE_INTERFACE CUTEE_ALIGN(16) vec3a_t : public vec_t<T,3> {
       inline vec3a_t() {}
       inline vec3a_t(const T &t) : vec_t<T,3>(t) {}
       inline vec3a_t(const T &x, const T &y, const T &z) : vec_t<T,3>(x,y,z) {}
-#ifdef __CUDACC__
-      inline __both__ vec3a_t(const int3 &v) : vec_t<T,3>(v) {};
-      inline __both__ vec3a_t(const uint3 &v) : vec_t<T,3>(v) {};
-      inline __both__ vec3a_t(const float3 &v) : vec_t<T,3>(v) {};
-      inline __both__ vec3a_t(const int4 v) : vec_t<T,3>(v) {};
-      inline __both__ vec3a_t(const uint4 v) : vec_t<T,3>(v) {};
-      inline __both__ vec3a_t(const float4 v) : vec_t<T,3>(v) {};
-#endif
 
       template<typename OT>
         inline vec3a_t(const vec_t<OT,3> &v) : vec_t<T,3>(v.x,v.y,v.z) {}
@@ -229,45 +187,31 @@ namespace cutee {
     // vec4
     // ------------------------------------------------------------------
     template<typename T>
-    struct QTOWL_INTERFACE vec_t<T,4> {
+    struct CUTEE_INTERFACE vec_t<T,4> {
       enum { dims = 4 };
       typedef T scalar_t;
     
-      inline __both__ vec_t() {}
+      inline vec_t() {}
 
-      inline __both__ vec_t(const T &t)
+      inline vec_t(const T &t)
         : x(t), y(t), z(t), w(t)
       {}
-      inline __both__ vec_t(const vec_t<T,3> &xyz, const T &_w)
+      inline vec_t(const vec_t<T,3> &xyz, const T &_w)
         : x(xyz.x), y(xyz.y), z(xyz.z), w(_w)
       {}
-      inline __both__ vec_t(const T &_x, const T &_y, const T &_z, const T &_w)
+      inline vec_t(const T &_x, const T &_y, const T &_z, const T &_w)
         : x(_x), y(_y), z(_z), w(_w)
       {}
     
-#ifdef __CUDACC__
-      inline __both__ vec_t(const float4 &v)
-        : x(v.x), y(v.y), z(v.z), w(v.w)
-        {}
-      inline __both__ vec_t(const int4 &v)
-        : x(v.x), y(v.y), z(v.z), w(v.w)
-        {}
-      inline __both__ vec_t(const uint4 &v)
-        : x(v.x), y(v.y), z(v.z), w(v.w)
-        {}
-      inline __both__ operator float4() const { return make_float4(x,y,z,w); }
-      inline __both__ operator uint4()  const { return make_uint4(x,y,z,w); }
-      inline __both__ operator int4()   const { return make_int4(x,y,z,w); }
-#endif
       /*! construct 3-vector from 3-vector of another type */
       template<typename OT>
-        inline __both__ explicit vec_t(const vec_t<OT,4> &o)
+        inline explicit vec_t(const vec_t<OT,4> &o)
         : x((T)o.x), y((T)o.y), z((T)o.z), w((T)o.w)
         {}
-      inline __both__ vec_t(const vec_t<T,4> &o) : x(o.x), y(o.y), z(o.z), w(o.w) {}
+      inline vec_t(const vec_t<T,4> &o) : x(o.x), y(o.y), z(o.z), w(o.w) {}
 
       /*! assignment operator */
-      inline __both__ vec_t<T,4> &operator=(const vec_t<T,4> &other) {
+      inline vec_t<T,4> &operator=(const vec_t<T,4> &other) {
         this->x = other.x;
         this->y = other.y;
         this->z = other.z;
@@ -275,11 +219,11 @@ namespace cutee {
         return *this;
       }
     
-      inline __both__ T &operator[](size_t dim) { return (&x)[dim]; }
-      inline __both__ const T &operator[](size_t dim) const { return (&x)[dim]; }
+      inline T &operator[](size_t dim) { return (&x)[dim]; }
+      inline const T &operator[](size_t dim) const { return (&x)[dim]; }
 
       template<typename OT, typename Lambda>
-        static inline __both__ vec_t<T,4> make_from(const vec_t<OT,4> &v,
+        static inline vec_t<T,4> make_from(const vec_t<OT,4> &v,
                                                     const Lambda &lambda)
       { return vec_t<T,4>(lambda(v.x),lambda(v.y),lambda(v.z),lambda(v.w)); }
     
@@ -287,7 +231,7 @@ namespace cutee {
     };
 
     template<typename T>
-    inline __both__ vec_t<T,3>::vec_t(const vec_t<T,4> &v)
+    inline vec_t<T,3>::vec_t(const vec_t<T,4> &v)
       : x(v.x), y(v.y), z(v.z)
     {}
 
@@ -296,12 +240,12 @@ namespace cutee {
     // =======================================================
 
     template<typename T>
-    inline __both__ typename long_type_of<T>::type area(const vec_t<T,2> &v)
+    inline typename long_type_of<T>::type area(const vec_t<T,2> &v)
     { return (typename long_type_of<T>::type)(v.x)*(typename long_type_of<T>::type)(v.y); }
 
   
     template<typename T>
-    inline __both__ typename long_type_of<T>::type volume(const vec_t<T,3> &v)
+    inline typename long_type_of<T>::type volume(const vec_t<T,3> &v)
     { return
         (typename long_type_of<T>::type)(v.x)*
         (typename long_type_of<T>::type)(v.y)*
@@ -309,7 +253,7 @@ namespace cutee {
     }
 
     template<typename T>
-    inline __both__ typename long_type_of<T>::type volume(const vec_t<T,4> &v)
+    inline typename long_type_of<T>::type volume(const vec_t<T,4> &v)
     { return
         (typename long_type_of<T>::type)(v.x)*
         (typename long_type_of<T>::type)(v.y)*
@@ -318,7 +262,7 @@ namespace cutee {
     }
 
     template<typename T>
-    inline __both__ typename long_type_of<T>::type area(const vec_t<T,3> &v)
+    inline typename long_type_of<T>::type area(const vec_t<T,3> &v)
     { return
         T(2)*((typename long_type_of<T>::type)(v.x)*v.y+
               (typename long_type_of<T>::type)(v.y)*v.z+
@@ -329,7 +273,7 @@ namespace cutee {
 
     /*! vector cross product */
     template<typename T>
-    inline __both__ vec_t<T,3> cross(const vec_t<T,3> &a, const vec_t<T,3> &b)
+    inline vec_t<T,3> cross(const vec_t<T,3> &a, const vec_t<T,3> &b)
     {
       return vec_t<T,3>(a.y*b.z-b.y*a.z,
                         a.z*b.x-b.z*a.x,
@@ -338,55 +282,55 @@ namespace cutee {
 
     /*! vector cross product */
     template<typename T>
-    inline __both__ T dot(const vec_t<T,2> &a, const vec_t<T,2> &b)
+    inline T dot(const vec_t<T,2> &a, const vec_t<T,2> &b)
     {
       return a.x*b.x + a.y*b.y;
     }
 
     /*! vector cross product */
     template<typename T>
-    inline __both__ T dot(const vec_t<T,3> &a, const vec_t<T,3> &b)
+    inline T dot(const vec_t<T,3> &a, const vec_t<T,3> &b)
     {
       return a.x*b.x + a.y*b.y + a.z*b.z;
     }
     
     /*! vector cross product */
     template<typename T>
-    inline __both__ vec_t<T,3> normalize(const vec_t<T,3> &v)
+    inline vec_t<T,3> normalize(const vec_t<T,3> &v)
     {
       return v * cutee::common::polymorphic::rsqrt(dot(v,v));
     }
 
     /*! vector cross product */
     template<typename T>
-    inline __both__ T length(const vec_t<T,3> &v)
+    inline T length(const vec_t<T,3> &v)
     {
       return cutee::common::polymorphic::sqrt(dot(v,v));
     }
 
     template<typename T>
-    inline __qtowl_host std::ostream &operator<<(std::ostream &o, const vec_t<T,1> &v)
+    inline std::ostream &operator<<(std::ostream &o, const vec_t<T,1> &v)
     {
       o << "(" << v.x << ")";
       return o;
     }
   
     template<typename T>
-    inline __qtowl_host std::ostream &operator<<(std::ostream &o, const vec_t<T,2> &v)
+    inline std::ostream &operator<<(std::ostream &o, const vec_t<T,2> &v)
     {
       o << "(" << v.x << "," << v.y << ")";
       return o;
     }
   
     template<typename T>
-    inline __qtowl_host std::ostream &operator<<(std::ostream &o, const vec_t<T,3> &v)
+    inline std::ostream &operator<<(std::ostream &o, const vec_t<T,3> &v)
     {
       o << "(" << v.x << "," << v.y << "," << v.z << ")";
       return o;
     }
 
     template<typename T>
-    inline __qtowl_host std::ostream &operator<<(std::ostream &o, const vec_t<T,4> &v)
+    inline std::ostream &operator<<(std::ostream &o, const vec_t<T,4> &v)
     {
       o << "(" << v.x << "," << v.y << "," << v.z <<  "," << v.w << ")";
       return o;
@@ -416,13 +360,13 @@ namespace cutee {
   
 #undef _define_vec_types
 
-    inline __both__ vec_t<bool,3> ge(const vec3f &a, const vec3f &b)
+    inline vec_t<bool,3> ge(const vec3f &a, const vec3f &b)
     { return { a.x >= b.x, a.y >= b.y, a.z >= b.z }; }
     
-    inline __both__ vec_t<bool,3> lt(const vec3f &a, const vec3f &b)
+    inline vec_t<bool,3> lt(const vec3f &a, const vec3f &b)
     { return { a.x < b.x, a.y < b.y, a.z < b.z }; }
 
-    inline __both__ bool any(vec_t<bool,3> v)
+    inline bool any(vec_t<bool,3> v)
     { return v.x | v.y | v.z; }
     
 
@@ -433,15 +377,15 @@ namespace cutee {
     // ------------------------------------------------------------------
 
     template<typename T>
-    inline __both__ bool operator==(const vec_t<T,2> &a, const vec_t<T,2> &b)
+    inline bool operator==(const vec_t<T,2> &a, const vec_t<T,2> &b)
     { return a.x==b.x && a.y==b.y; }
 
     template<typename T>
-    inline __both__ bool operator==(const vec_t<T,3> &a, const vec_t<T,3> &b)
+    inline bool operator==(const vec_t<T,3> &a, const vec_t<T,3> &b)
     { return a.x==b.x && a.y==b.y && a.z==b.z; }
 
     template<typename T>
-    inline __both__ bool operator==(const vec_t<T,4> &a, const vec_t<T,4> &b)
+    inline bool operator==(const vec_t<T,4> &a, const vec_t<T,4> &b)
     { return a.x==b.x && a.y==b.y && a.z==b.z && a.w==b.w; }
   
     // ------------------------------------------------------------------
@@ -449,7 +393,7 @@ namespace cutee {
     // ------------------------------------------------------------------
   
     template<typename T, int N>
-    inline __both__ bool operator!=(const vec_t<T,N> &a, const vec_t<T,N> &b)
+    inline bool operator!=(const vec_t<T,N> &a, const vec_t<T,N> &b)
     { return !(a==b); }
 
 
@@ -462,17 +406,17 @@ namespace cutee {
     // ------------------------------------------------------------------
 
     template<typename T>
-    inline __both__ auto nt(const vec_t<T,2> &a)
+    inline auto nt(const vec_t<T,2> &a)
       -> vec_t<decltype(!a.x),2>
     { return { !a.x, !a.y }; }
 
     template<typename T>
-    inline __both__ auto nt(const vec_t<T,3> &a)
+    inline auto nt(const vec_t<T,3> &a)
       -> vec_t<decltype(!a.x),3>
     { return { !a.x, !a.y, !a.z }; }
 
     template<typename T>
-    inline __both__ auto nt(const vec_t<T,4> &a)
+    inline auto nt(const vec_t<T,4> &a)
       -> vec_t<decltype(!a.x),4>
     { return { !a.x, !a.y, !a.z, !a.w }; }
 
@@ -481,17 +425,17 @@ namespace cutee {
     // ------------------------------------------------------------------
 
     template<typename T>
-    inline __both__ auto eq(const vec_t<T,2> &a, const vec_t<T,2> &b)
+    inline auto eq(const vec_t<T,2> &a, const vec_t<T,2> &b)
       -> vec_t<decltype(a.x==b.x),2>
     { return { a.x==b.x, a.y==b.y }; }
 
     template<typename T>
-    inline __both__ auto eq(const vec_t<T,3> &a, const vec_t<T,3> &b)
+    inline auto eq(const vec_t<T,3> &a, const vec_t<T,3> &b)
       -> vec_t<decltype(a.x==b.x),3>
     { return { a.x==b.x, a.y==b.y, a.z==b.z }; }
 
     template<typename T>
-    inline __both__ auto eq(const vec_t<T,4> &a, const vec_t<T,4> &b)
+    inline auto eq(const vec_t<T,4> &a, const vec_t<T,4> &b)
       -> vec_t<decltype(a.x==b.x),4>
     { return { a.x==b.x, a.y==b.y, a.z==b.z, a.w==b.w }; }
 
@@ -500,7 +444,7 @@ namespace cutee {
     // ------------------------------------------------------------------
 
     template<typename T, int N>
-    inline __both__ auto neq(const vec_t<T,N> &a, const vec_t<T,N> &b)
+    inline auto neq(const vec_t<T,N> &a, const vec_t<T,N> &b)
       -> decltype(nt(eq(a,b)))
     { return nt(eq(a,b)); }
 
@@ -511,15 +455,15 @@ namespace cutee {
     // ------------------------------------------------------------------
 
     template<typename T, int N>
-    inline __both__ bool any(const vec_t<T,N> &a)
+    inline bool any(const vec_t<T,N> &a)
     { for (int i=0;i<N;++i) if (a[i]) return true; return false; }
 
     template<typename T, int N>
-    inline __both__ bool all(const vec_t<T,N> &a)
+    inline bool all(const vec_t<T,N> &a)
     { for (int i=0;i<N;++i) if (!a[i]) return false; return true; }
 
     // template<typename T>
-    // inline __both__ bool any(const vec_t<T,3> &a)
+    // inline bool any(const vec_t<T,3> &a)
     // { return a[i] | b[i] | c[i]; }
 
     // ------------------------------------------------------------------
@@ -527,25 +471,25 @@ namespace cutee {
     // ------------------------------------------------------------------
 
     template<typename T>
-    inline __both__ vec_t<T,2> select(const vec_t<bool,2> &mask,
+    inline vec_t<T,2> select(const vec_t<bool,2> &mask,
                                       const vec_t<T,2> &a,
                                       const vec_t<T,2> &b)
     { return { mask.x?a.x:b.x, mask.y?a.y:b.y }; }
 
     template<typename T>
-    inline __both__ vec_t<T,3> select(const vec_t<bool,3> &mask,
+    inline vec_t<T,3> select(const vec_t<bool,3> &mask,
                                       const vec_t<T,3> &a,
                                       const vec_t<T,3> &b)
     { return { mask.x?a.x:b.x, mask.y?a.y:b.y, mask.z?a.z:b.z }; }
 
     template<typename T>
-    inline __both__ vec_t<T,4> select(const vec_t<bool,4> &mask,
+    inline vec_t<T,4> select(const vec_t<bool,4> &mask,
                                       const vec_t<T,4> &a,
                                       const vec_t<T,4> &b)
     { return { mask.x?a.x:b.x, mask.y?a.y:b.y, mask.z?a.z:b.z }; }
 
     template<typename T, int N>
-    inline __both__ vec_t<T,N> select(const vec_t<bool,N> &mask,
+    inline vec_t<T,N> select(const vec_t<bool,N> &mask,
                                       const vec_t<T,N> &a,
                                       const vec_t<T,N> &b)
     {
@@ -565,66 +509,66 @@ namespace cutee {
     // vector specializations of those scalar functors
     // =======================================================
 
-    template<typename T, int N> inline __both__
+    template<typename T, int N> inline
     bool any_less_than(const vec_t<T,N> &a, const vec_t<T,N> &b);
 
-    template<typename T, int N> inline __both__
+    template<typename T, int N> inline
     bool all_less_than(const vec_t<T,N> &a, const vec_t<T,N> &b);
 
-    template<typename T, int N> inline __both__
+    template<typename T, int N> inline
     bool any_greater_or_equal(const vec_t<T,N> &a, const vec_t<T,N> &b);
 
-    template<typename T, int N> inline __both__
+    template<typename T, int N> inline
     bool any_less_than(const vec_t<T,N> &a, const vec_t<T,N> &b);
 
     // ----------- specialization for 2 -----------
-    template<typename T> inline __both__
+    template<typename T> inline
     bool any_less_than(const vec_t<T,2> &a, const vec_t<T,2> &b)
     { return (a.x < b.x) | (a.y < b.y); }
   
-    template<typename T> inline __both__
+    template<typename T> inline
     bool all_less_than(const vec_t<T,2> &a, const vec_t<T,2> &b)
     { return (a.x < b.x) & (a.y < b.y); }
   
-    template<typename T> inline __both__
+    template<typename T> inline
     bool any_greater_than(const vec_t<T,2> &a, const vec_t<T,2> &b)
     { return (a.x > b.x) | (a.y > b.y); }
 
-    template<typename T> inline __both__
+    template<typename T> inline
     bool any_greater_or_equal(const vec_t<T,2> &a, const vec_t<T,2> &b)
     { return (a.x >= b.x) | (a.y >= b.y); }
 
     // ----------- specialization for 3 -----------
-    template<typename T> inline __both__
+    template<typename T> inline
     bool any_less_than(const vec_t<T,3> &a, const vec_t<T,3> &b)
     { return (a.x < b.x) | (a.y < b.y) | (a.z < b.z); }
   
-    template<typename T> inline __both__
+    template<typename T> inline
     bool all_less_than(const vec_t<T,3> &a, const vec_t<T,3> &b)
     { return (a.x < b.x) & (a.y < b.y) & (a.z < b.z); }
   
-    template<typename T> inline __both__
+    template<typename T> inline
     bool any_greater_than(const vec_t<T,3> &a, const vec_t<T,3> &b)
     { return (a.x > b.x) | (a.y > b.y) | (a.z > b.z); }
 
-    template<typename T> inline __both__
+    template<typename T> inline
     bool any_greater_or_equal(const vec_t<T,3> &a, const vec_t<T,3> &b)
     { return (a.x >= b.x) | (a.y >= b.y) | (a.z >= b.z); }
 
     // ----------- specialization for 4 -----------
-    template<typename T> inline __both__
+    template<typename T> inline
     bool any_less_than(const vec_t<T,4> &a, const vec_t<T,4> &b)
     { return (a.x < b.x) | (a.y < b.y) | (a.z < b.z) | (a.w < b.w); }
   
-    template<typename T> inline __both__
+    template<typename T> inline
     bool all_less_than(const vec_t<T,4> &a, const vec_t<T,4> &b)
     { return (a.x < b.x) & (a.y < b.y) & (a.z < b.z) & (a.w < b.w); }
   
-    template<typename T> inline __both__
+    template<typename T> inline
     bool any_greater_than(const vec_t<T,4> &a, const vec_t<T,4> &b)
     { return (a.x > b.x) | (a.y > b.y) | (a.z > b.z) | (a.w > b.w); }
 
-    template<typename T> inline __both__
+    template<typename T> inline
     bool any_greater_or_equal(const vec_t<T,4> &a, const vec_t<T,4> &b)
     { return (a.x >= b.x) | (a.y >= b.y) | (a.z >= b.z) | (a.w >= b.w); }
 
@@ -633,21 +577,21 @@ namespace cutee {
     // -------------------------------------------------------
 
     template<typename T>
-    inline __both__ T clamp(const T &val, const T &lo, const T &hi)
+    inline T clamp(const T &val, const T &lo, const T &hi)
     { return min(hi,max(lo,val)); }
   
     template<typename T>
-    inline __both__ T clamp(const T &val, const T &hi)
+    inline T clamp(const T &val, const T &hi)
     { return clamp(val,(T)0,hi); }
   
 #define _define_float_functor(func)                                     \
-    template<typename T> inline __both__ vec_t<T,2> func(const vec_t<T,2> &v) \
+    template<typename T> inline vec_t<T,2> func(const vec_t<T,2> &v) \
     { return vec_t<T,2>(cutee::common::func(v.x),cutee::common::func(v.y)); } \
                                                                         \
-    template<typename T> inline __both__ vec_t<T,3> func(const vec_t<T,3> &v) \
+    template<typename T> inline vec_t<T,3> func(const vec_t<T,3> &v) \
     { return vec_t<T,3>(cutee::common::func(v.x),cutee::common::func(v.y),cutee::common::func(v.z)); } \
                                                                         \
-    template<typename T> inline __both__ vec_t<T,4> func(const vec_t<T,4> &v) \
+    template<typename T> inline vec_t<T,4> func(const vec_t<T,4> &v) \
     { return vec_t<T,4>(cutee::common::func(v.x),cutee::common::func(v.y),cutee::common::func(v.z),cutee::common::func(v.w)); } \
 
     _define_float_functor(rcp)
@@ -664,20 +608,20 @@ namespace cutee {
 
 #define _define_binary_functor(fct)                                     \
     template<typename T>                                                \
-    inline __both__ vec_t<T,1> fct(const vec_t<T,1> &a, const vec_t<T,1> &b) \
+    inline vec_t<T,1> fct(const vec_t<T,1> &a, const vec_t<T,1> &b) \
     {                                                                   \
       return vec_t<T,1>(fct(a.x,b.x));                                  \
     }                                                                   \
                                                                         \
     template<typename T>                                                \
-    inline __both__ vec_t<T,2> fct(const vec_t<T,2> &a, const vec_t<T,2> &b) \
+    inline vec_t<T,2> fct(const vec_t<T,2> &a, const vec_t<T,2> &b) \
     {                                                                   \
       return vec_t<T,2>(fct(a.x,b.x),                                   \
                         fct(a.y,b.y));                                  \
     }                                                                   \
                                                                         \
     template<typename T>                                                \
-    inline __both__ vec_t<T,3> fct(const vec_t<T,3> &a, const vec_t<T,3> &b) \
+    inline vec_t<T,3> fct(const vec_t<T,3> &a, const vec_t<T,3> &b) \
     {                                                                   \
       return vec_t<T,3>(fct(a.x,b.x),                                   \
                         fct(a.y,b.y),                                   \
@@ -685,7 +629,7 @@ namespace cutee {
     }                                                                   \
                                                                         \
     template<typename T1, typename T2>                                  \
-    inline __both__ vec_t<typename BinaryOpResultType<T1,T2>::type,3>   \
+    inline vec_t<typename BinaryOpResultType<T1,T2>::type,3>   \
     fct(const vec_t<T1,3> &a, const vec_t<T2,3> &b)                     \
     {                                                                   \
       return vec_t<typename BinaryOpResultType<T1,T2>::type,3>          \
@@ -695,7 +639,7 @@ namespace cutee {
     }                                                                   \
                                                                         \
     template<typename T>                                                \
-    inline __both__ vec_t<T,4> fct(const vec_t<T,4> &a, const vec_t<T,4> &b) \
+    inline vec_t<T,4> fct(const vec_t<T,4> &a, const vec_t<T,4> &b) \
     {                                                                   \
       return vec_t<T,4>(fct(a.x,b.x),                                   \
                         fct(a.y,b.y),                                   \
@@ -720,51 +664,51 @@ namespace cutee {
 #define _define_operator(op)                                            \
     /* vec op vec */                                                    \
     template<typename T>                                                \
-    inline __both__ vec_t<T,2> operator op(const vec_t<T,2> &a,         \
+    inline vec_t<T,2> operator op(const vec_t<T,2> &a,         \
                                            const vec_t<T,2> &b)         \
     { return vec_t<T,2>(a.x op b.x, a.y op b.y); }                      \
                                                                         \
     template<typename T>                                                \
-    inline __both__ vec_t<T,3> operator op(const vec_t<T,3> &a,         \
+    inline vec_t<T,3> operator op(const vec_t<T,3> &a,         \
                                            const vec_t<T,3> &b)         \
     { return vec_t<T,3>(a.x op b.x, a.y op b.y, a.z op b.z); }          \
                                                                         \
     template<typename T>                                                \
-    inline __both__ vec_t<T,4> operator op(const vec_t<T,4> &a,         \
+    inline vec_t<T,4> operator op(const vec_t<T,4> &a,         \
                                            const vec_t<T,4> &b)         \
     { return vec_t<T,4>(a.x op b.x,a.y op b.y,a.z op b.z,a.w op b.w); } \
                                                                         \
     /* vec op scalar */                                                 \
     template<typename T>                                                \
-    inline __both__ vec_t<T,2> operator op(const vec_t<T,2> &a,         \
+    inline vec_t<T,2> operator op(const vec_t<T,2> &a,         \
                                            const T &b)                  \
     { return vec_t<T,2>(a.x op b, a.y op b); }                          \
                                                                         \
     template<typename T1, typename T2>                                  \
-    inline __both__ vec_t<typename BinaryOpResultType<T1,T2>::type,3>   \
+    inline vec_t<typename BinaryOpResultType<T1,T2>::type,3>   \
     operator op(const vec_t<T1,3> &a, const T2 &b)                      \
     { return vec_t<typename BinaryOpResultType<T1,T2>::type,3>          \
         (a.x op b, a.y op b, a.z op b);                                 \
     }                                                                   \
                                                                         \
     template<typename T>                                                \
-    inline __both__ vec_t<T,4> operator op(const vec_t<T,4> &a,         \
+    inline vec_t<T,4> operator op(const vec_t<T,4> &a,         \
                                            const T &b)                  \
     { return vec_t<T,4>(a.x op b, a.y op b, a.z op b, a.w op b); }      \
                                                                         \
     /* scalar op vec */                                                 \
     template<typename T>                                                \
-    inline __both__ vec_t<T,2> operator op(const T &a,                  \
+    inline vec_t<T,2> operator op(const T &a,                  \
                                            const vec_t<T,2> &b)         \
     { return vec_t<T,2>(a op b.x, a op b.y); }                          \
                                                                         \
     template<typename T>                                                \
-    inline __both__ vec_t<T,3> operator op(const T &a,                  \
+    inline vec_t<T,3> operator op(const T &a,                  \
                                            const vec_t<T,3> &b)         \
     { return vec_t<T,3>(a op b.x, a op b.y, a op b.z); }                \
                                                                         \
     template<typename T>                                                \
-    inline __both__ vec_t<T,4> operator op(const T &a,                  \
+    inline vec_t<T,4> operator op(const T &a,                  \
                                            const vec_t<T,4> &b)         \
     { return vec_t<T,4>(a op b.x, a op b.y, a op b.z, a op b.w); }      \
                                                                         \
@@ -786,19 +730,19 @@ namespace cutee {
     // -------------------------------------------------------
 
     template<typename T>
-    inline __both__ vec_t<T,2> operator-(const vec_t<T,2> &v)
+    inline vec_t<T,2> operator-(const vec_t<T,2> &v)
     { return vec_t<T,2>(-v.x, -v.y); }
   
     template<typename T>
-    inline __both__ vec_t<T,2> operator+(const vec_t<T,2> &v)
+    inline vec_t<T,2> operator+(const vec_t<T,2> &v)
     { return vec_t<T,2>(v.x, v.y); }
 
     template<typename T>
-    inline __both__ vec_t<T,3> operator-(const vec_t<T,3> &v)
+    inline vec_t<T,3> operator-(const vec_t<T,3> &v)
     { return vec_t<T,3>(-v.x, -v.y, -v.z); }
   
     template<typename T>
-    inline __both__ vec_t<T,3> operator+(const vec_t<T,3> &v)
+    inline vec_t<T,3> operator+(const vec_t<T,3> &v)
     { return vec_t<T,3>(v.x, v.y, v.z); }
 
 
@@ -809,7 +753,7 @@ namespace cutee {
 #define  _define_op_assign_operator(operator_op,op)                     \
     /* vec op vec */                                                    \
     template<typename T, typename OT>                                   \
-    inline __both__ vec_t<T,2> &operator_op(vec_t<T,2> &a,              \
+    inline vec_t<T,2> &operator_op(vec_t<T,2> &a,              \
                                             const vec_t<OT,2> &b)       \
     {                                                                   \
       a.x op (T)b.x;                                                    \
@@ -818,7 +762,7 @@ namespace cutee {
     }                                                                   \
                                                                         \
     template<typename T, typename OT>                                   \
-    inline __both__ vec_t<T,3> &operator_op(vec_t<T,3> &a,              \
+    inline vec_t<T,3> &operator_op(vec_t<T,3> &a,              \
                                             const vec_t<OT,3> &b)       \
     {                                                                   \
       a.x op (T)b.x;                                                    \
@@ -828,7 +772,7 @@ namespace cutee {
     }                                                                   \
                                                                         \
     template<typename T, typename OT>                                   \
-    inline __both__ vec_t<T,4> &operator_op(vec_t<T,4> &a,              \
+    inline vec_t<T,4> &operator_op(vec_t<T,4> &a,              \
                                             const vec_t<OT,4> &b)       \
     {                                                                   \
       a.x op (T)b.x;                                                    \
@@ -840,17 +784,17 @@ namespace cutee {
                                                                         \
     /* vec op scalar */                                                 \
     template<typename T, typename OT>                                   \
-    inline __both__ vec_t<T,2> &operator_op(vec_t<T,2> &a,              \
+    inline vec_t<T,2> &operator_op(vec_t<T,2> &a,              \
                                             const OT &b)                \
     { a.x op (T)b; a.y op (T)b; return a; }                             \
                                                                         \
     template<typename T, typename OT>                                   \
-    inline __both__ vec_t<T,3> &operator_op(vec_t<T,3> &a,              \
+    inline vec_t<T,3> &operator_op(vec_t<T,3> &a,              \
                                             const OT &b)                \
     { a.x op (T)b; a.y op (T)b; a.z op (T)b; return a; }                \
                                                                         \
     template<typename T, typename OT>                                   \
-    inline __both__ vec_t<T,4> &operator_op(vec_t<T,4> &a,              \
+    inline vec_t<T,4> &operator_op(vec_t<T,4> &a,              \
                                             const OT &b)                \
     { a.x op (T)b; a.y op (T)b; a.z op (T)b; a.w op (T)b; return a; }   \
     
@@ -863,30 +807,30 @@ namespace cutee {
 
 
     template<typename T>
-    __both__ T reduce_min(const vec_t<T,1> &v) { return v.x; }
+    T reduce_min(const vec_t<T,1> &v) { return v.x; }
     template<typename T>
-    __both__ T reduce_min(const vec_t<T,2> &v) { return min(v.x,v.y); }
+    T reduce_min(const vec_t<T,2> &v) { return min(v.x,v.y); }
     template<typename T>
-    __both__ T reduce_min(const vec_t<T,3> &v) { return min(min(v.x,v.y),v.z); }
+    T reduce_min(const vec_t<T,3> &v) { return min(min(v.x,v.y),v.z); }
     template<typename T>
-    __both__ T reduce_min(const vec_t<T,4> &v) { return min(min(v.x,v.y),min(v.z,v.w)); }
+    T reduce_min(const vec_t<T,4> &v) { return min(min(v.x,v.y),min(v.z,v.w)); }
     template<typename T>
-    __both__ T reduce_max(const vec_t<T,2> &v) { return max(v.x,v.y); }
+    T reduce_max(const vec_t<T,2> &v) { return max(v.x,v.y); }
     template<typename T>
-    __both__ T reduce_max(const vec_t<T,3> &v) { return max(max(v.x,v.y),v.z); }
+    T reduce_max(const vec_t<T,3> &v) { return max(max(v.x,v.y),v.z); }
     template<typename T>
-    __both__ T reduce_max(const vec_t<T,4> &v) { return max(max(v.x,v.y),max(v.z,v.w)); }
+    T reduce_max(const vec_t<T,4> &v) { return max(max(v.x,v.y),max(v.z,v.w)); }
 
 
     template<typename T, int N>
-    __both__ vec_t<T,3> madd(const vec_t<T,N> &a, const vec_t<T,N> &b, const vec_t<T,N> &c)
+    vec_t<T,3> madd(const vec_t<T,N> &a, const vec_t<T,N> &b, const vec_t<T,N> &c)
     {
       return a*b + c;
     }
 
 
     template<typename T, int N>
-    __both__ int arg_max(const vec_t<T,N> &v)
+    int arg_max(const vec_t<T,N> &v)
     {
       int biggestDim = 0;
       for (int i=1;i<N;i++)
@@ -895,7 +839,7 @@ namespace cutee {
     }
 
     template<typename T, int N>
-    __both__ int arg_min(const vec_t<T,N> &v)
+    int arg_min(const vec_t<T,N> &v)
     {
       int biggestDim = 0;
       for (int i=1;i<N;i++)
@@ -906,14 +850,14 @@ namespace cutee {
 
     // less, for std::set, std::map, etc
     template<typename T>
-    __both__ bool operator<(const vec_t<T,2> &a, const vec_t<T,2> &b)
+    bool operator<(const vec_t<T,2> &a, const vec_t<T,2> &b)
     {
       if (a.x < b.x) return true;
       if (a.x == b.x && a.y < b.y) return true;
       return false;
     }
     template<typename T>
-    __both__ bool operator<(const vec_t<T,3> &a, const vec_t<T,3> &b)
+    bool operator<(const vec_t<T,3> &a, const vec_t<T,3> &b)
     {
       if (a.x < b.x) return true;
       if (a.x == b.x && a.y < b.y) return true;
@@ -921,7 +865,7 @@ namespace cutee {
       return false;
     }
     template<typename T>
-    __both__ bool operator<(const vec_t<T,4> &a, const vec_t<T,4> &b)
+    bool operator<(const vec_t<T,4> &a, const vec_t<T,4> &b)
     {
       if (a.x < b.x) return true;
       if (a.x == b.x && a.y < b.y) return true;
@@ -931,7 +875,7 @@ namespace cutee {
     }
 
     /*! helper function that creates a semi-random color from an ID */
-    inline __both__ vec3f randomColor(int i)
+    inline vec3f randomColor(int i)
     {
       int r = unsigned(i)*13*17 + 0x234235;
       int g = unsigned(i)*7*3*5 + 0x773477;
@@ -942,7 +886,7 @@ namespace cutee {
     }
 
     /*! helper function that creates a semi-random color from an ID */
-    inline __both__ vec3f randomColor(size_t idx)
+    inline vec3f randomColor(size_t idx)
     {
       unsigned int r = (unsigned int)(idx*13*17 + 0x234235);
       unsigned int g = (unsigned int)(idx*7*3*5 + 0x773477);
@@ -954,15 +898,15 @@ namespace cutee {
 
     /*! helper function that creates a semi-random color from an ID */
     template<typename T>
-    inline __both__ vec3f randomColor(const T *ptr)
+    inline vec3f randomColor(const T *ptr)
     {
       return randomColor((size_t)ptr);
     }
 
-    inline __both__ float sqrt(const float v) { return sqrtf(v); }
-    inline __both__ vec2f sqrt(const vec2f v) { return vec2f(sqrtf(v.x),sqrtf(v.y)); }
-    inline __both__ vec3f sqrt(const vec3f v) { return vec3f(sqrtf(v.x),sqrtf(v.y),sqrtf(v.z)); }
-    inline __both__ vec4f sqrt(const vec4f v) { return vec4f(sqrtf(v.x),sqrtf(v.y),sqrtf(v.z),sqrtf(v.w)); }
+    inline float sqrt(const float v) { return sqrtf(v); }
+    inline vec2f sqrt(const vec2f v) { return vec2f(sqrtf(v.x),sqrtf(v.y)); }
+    inline vec3f sqrt(const vec3f v) { return vec3f(sqrtf(v.x),sqrtf(v.y),sqrtf(v.z)); }
+    inline vec4f sqrt(const vec4f v) { return vec4f(sqrtf(v.x),sqrtf(v.y),sqrtf(v.z),sqrtf(v.w)); }
 
     
   } // ::cutee::common

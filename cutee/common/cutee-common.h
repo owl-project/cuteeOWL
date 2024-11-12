@@ -56,27 +56,27 @@
 #endif
 
 #if defined(_MSC_VER)
-#  define QTOWL_DLL_EXPORT __declspec(dllexport)
-#  define QTOWL_DLL_IMPORT __declspec(dllimport)
+#  define CUTEE_DLL_EXPORT __declspec(dllexport)
+#  define CUTEE_DLL_IMPORT __declspec(dllimport)
 #elif defined(__clang__) || defined(__GNUC__)
-#  define QTOWL_DLL_EXPORT __attribute__((visibility("default")))
-#  define QTOWL_DLL_IMPORT __attribute__((visibility("default")))
+#  define CUTEE_DLL_EXPORT __attribute__((visibility("default")))
+#  define CUTEE_DLL_IMPORT __attribute__((visibility("default")))
 #else
-#  define QTOWL_DLL_EXPORT
-#  define QTOWL_DLL_IMPORT
+#  define CUTEE_DLL_EXPORT
+#  define CUTEE_DLL_IMPORT
 #endif
 
 // #if 1
-# define QTOWL_INTERFACE /* nothing - currently not building any special 'owl.dll' */
+# define CUTEE_INTERFACE /* nothing - currently not building any special 'owl.dll' */
 // #else
-// //#if defined(QTOWL_DLL_INTERFACE)
+// //#if defined(CUTEE_DLL_INTERFACE)
 // #  ifdef owl_EXPORTS
-// #    define QTOWL_INTERFACE QTOWL_DLL_EXPORT
+// #    define CUTEE_INTERFACE CUTEE_DLL_EXPORT
 // #  else
-// #    define QTOWL_INTERFACE QTOWL_DLL_IMPORT
+// #    define CUTEE_INTERFACE CUTEE_DLL_IMPORT
 // #  endif
 // //#else
-// //#  define QTOWL_INTERFACE /*static lib*/
+// //#  define CUTEE_INTERFACE /*static lib*/
 // //#endif
 // #endif
 
@@ -97,17 +97,6 @@
 # define PING std::cout << __FILE__ << "::" << __LINE__ << ": " << __PRETTY_FUNCTION__ << std::endl;
 #endif
 #endif
-
-#if defined(__CUDA_ARCH__)
-# define __qtowl_device   __device__
-# define __qtowl_host     __host__
-#else
-# define __qtowl_device   /* ignore */
-# define __qtowl_host     /* ignore */
-#endif
-
-# define __both__   __qtowl_host __qtowl_device
-
 
 #ifdef __GNUC__
 #define MAYBE_UNUSED __attribute__((unused))
@@ -159,47 +148,47 @@
 // }
 // }
 
-// #define QTOWL_RAISE(MSG) ::detail::cuteeRaise_impl(MSG);
+// #define CUTEE_RAISE(MSG) ::detail::cuteeRaise_impl(MSG);
 
 
-#define QTOWL_NOTIMPLEMENTED throw std::runtime_error(std::string(__PRETTY_FUNCTION__)+" not implemented")
+#define CUTEE_NOTIMPLEMENTED throw std::runtime_error(std::string(__PRETTY_FUNCTION__)+" not implemented")
 
 // #ifdef WIN32
-// # define QTOWL_TERMINAL_RED ""
-// # define QTOWL_TERMINAL_GREEN ""
-// # define QTOWL_TERMINAL_LIGHT_GREEN ""
-// # define QTOWL_TERMINAL_YELLOW ""
-// # define QTOWL_TERMINAL_BLUE ""
-// # define QTOWL_TERMINAL_LIGHT_BLUE ""
-// # define QTOWL_TERMINAL_RESET ""
-// # define QTOWL_TERMINAL_DEFAULT QTOWL_TERMINAL_RESET
-// # define QTOWL_TERMINAL_BOLD ""
+// # define CUTEE_TERMINAL_RED ""
+// # define CUTEE_TERMINAL_GREEN ""
+// # define CUTEE_TERMINAL_LIGHT_GREEN ""
+// # define CUTEE_TERMINAL_YELLOW ""
+// # define CUTEE_TERMINAL_BLUE ""
+// # define CUTEE_TERMINAL_LIGHT_BLUE ""
+// # define CUTEE_TERMINAL_RESET ""
+// # define CUTEE_TERMINAL_DEFAULT CUTEE_TERMINAL_RESET
+// # define CUTEE_TERMINAL_BOLD ""
 
-// # define QTOWL_TERMINAL_MAGENTA ""
-// # define QTOWL_TERMINAL_LIGHT_MAGENTA ""
-// # define QTOWL_TERMINAL_CYAN ""
-// # define QTOWL_TERMINAL_LIGHT_RED ""
+// # define CUTEE_TERMINAL_MAGENTA ""
+// # define CUTEE_TERMINAL_LIGHT_MAGENTA ""
+// # define CUTEE_TERMINAL_CYAN ""
+// # define CUTEE_TERMINAL_LIGHT_RED ""
 // #else
-// # define QTOWL_TERMINAL_RED "\033[0;31m"
-// # define QTOWL_TERMINAL_GREEN "\033[0;32m"
-// # define QTOWL_TERMINAL_LIGHT_GREEN "\033[1;32m"
-// # define QTOWL_TERMINAL_YELLOW "\033[1;33m"
-// # define QTOWL_TERMINAL_BLUE "\033[0;34m"
-// # define QTOWL_TERMINAL_LIGHT_BLUE "\033[1;34m"
-// # define QTOWL_TERMINAL_RESET "\033[0m"
-// # define QTOWL_TERMINAL_DEFAULT QTOWL_TERMINAL_RESET
-// # define QTOWL_TERMINAL_BOLD "\033[1;1m"
+// # define CUTEE_TERMINAL_RED "\033[0;31m"
+// # define CUTEE_TERMINAL_GREEN "\033[0;32m"
+// # define CUTEE_TERMINAL_LIGHT_GREEN "\033[1;32m"
+// # define CUTEE_TERMINAL_YELLOW "\033[1;33m"
+// # define CUTEE_TERMINAL_BLUE "\033[0;34m"
+// # define CUTEE_TERMINAL_LIGHT_BLUE "\033[1;34m"
+// # define CUTEE_TERMINAL_RESET "\033[0m"
+// # define CUTEE_TERMINAL_DEFAULT CUTEE_TERMINAL_RESET
+// # define CUTEE_TERMINAL_BOLD "\033[1;1m"
 
-// # define QTOWL_TERMINAL_MAGENTA "\e[35m"
-// # define QTOWL_TERMINAL_LIGHT_MAGENTA "\e[95m"
-// # define QTOWL_TERMINAL_CYAN "\e[36m"
-// # define QTOWL_TERMINAL_LIGHT_RED "\033[1;31m"
+// # define CUTEE_TERMINAL_MAGENTA "\e[35m"
+// # define CUTEE_TERMINAL_LIGHT_MAGENTA "\e[95m"
+// # define CUTEE_TERMINAL_CYAN "\e[36m"
+// # define CUTEE_TERMINAL_LIGHT_RED "\033[1;31m"
 // #endif
 
 #ifdef _MSC_VER
-# define QTOWL_ALIGN(alignment) __declspec(align(alignment)) 
+# define CUTEE_ALIGN(alignment) __declspec(align(alignment)) 
 #else
-# define QTOWL_ALIGN(alignment) __attribute__((aligned(alignment)))
+# define CUTEE_ALIGN(alignment) __attribute__((aligned(alignment)))
 #endif
 
 
@@ -207,45 +196,23 @@
 namespace cutee {
   namespace common {
 
-#ifdef __CUDA_ARCH__
-    using ::min;
-    using ::max;
-    // inline __both__ float abs(float f)      { return fabsf(f); }
-    // inline __both__ double abs(double f)    { return fabs(f); }
-    using std::abs;
-    // inline __both__ float sin(float f) { return ::sinf(f); }
-    // inline __both__ double sin(double f) { return ::sin(f); }
-    // inline __both__ float cos(float f) { return ::cosf(f); }
-    // inline __both__ double cos(double f) { return ::cos(f); }
-
-    using ::saturate;
-#else
     using std::min;
     using std::max;
     using std::abs;
-    // inline __both__ double sin(double f) { return ::sin(f); }
-    inline __both__ float saturate(const float &f) { return min(1.f,max(0.f,f)); }
-#endif
+    inline float saturate(const float &f) { return min(1.f,max(0.f,f)); }
 
-    // inline __both__ float abs(float f)      { return fabsf(f); }
-    // inline __both__ double abs(double f)    { return fabs(f); }
-    inline __both__ float rcp(float f)      { return 1.f/f; }
-    inline __both__ double rcp(double d)    { return 1./d; }
+    // inline float abs(float f)      { return fabsf(f); }
+    // inline double abs(double f)    { return fabs(f); }
+    inline float rcp(float f)      { return 1.f/f; }
+    inline double rcp(double d)    { return 1./d; }
   
-    inline __both__ int32_t divRoundUp(int32_t a, int32_t b) { return (a+b-1)/b; }
-    inline __both__ uint32_t divRoundUp(uint32_t a, uint32_t b) { return (a+b-1)/b; }
-    inline __both__ int64_t divRoundUp(int64_t a, int64_t b) { return (a+b-1)/b; }
-    inline __both__ uint64_t divRoundUp(uint64_t a, uint64_t b) { return (a+b-1)/b; }
+    inline int32_t divRoundUp(int32_t a, int32_t b) { return (a+b-1)/b; }
+    inline uint32_t divRoundUp(uint32_t a, uint32_t b) { return (a+b-1)/b; }
+    inline int64_t divRoundUp(int64_t a, int64_t b) { return (a+b-1)/b; }
+    inline uint64_t divRoundUp(uint64_t a, uint64_t b) { return (a+b-1)/b; }
   
-// #ifdef __CUDA_ARCH__
-//     using ::sin; // this is the double version
-//     // inline __both__ float sin(float f) { return ::sinf(f); }
-//     using ::cos; // this is the double version
-//     // inline __both__ float cos(float f) { return ::cosf(f); }
-// #else
     using ::sin; // this is the double version
     using ::cos; // this is the double version
-// #endif
 
     /*! namespace that offers polymorphic overloads of functions like
         sqrt, rsqrt, sin, cos, etc (that vary based on float vs
@@ -254,16 +221,11 @@ namespace cutee {
         - TODO: make sure that cos, sin, abs, etc are also properly
         handled here. */
     namespace polymorphic {
-#ifdef __CUDA_ARCH__
-      inline __both__ float sqrt(const float f)     { return ::sqrtf(f); }
-      inline __both__ double sqrt(const double d)   { return ::sqrt(d); }
-#else
-      inline __both__ float sqrt(const float f)     { return ::sqrtf(f); }
-      inline __both__ double sqrt(const double d)   { return ::sqrt(d); }
-#endif
+      inline float sqrt(const float f)     { return ::sqrtf(f); }
+      inline double sqrt(const double d)   { return ::sqrt(d); }
       
-      inline __both__ float rsqrt(const float f)    { return 1.f/cutee::common::polymorphic::sqrt(f); }
-      inline __both__ double rsqrt(const double d)  { return 1./cutee::common::polymorphic::sqrt(d); }
+      inline float rsqrt(const float f)    { return 1.f/cutee::common::polymorphic::sqrt(f); }
+      inline double rsqrt(const double d)  { return 1./cutee::common::polymorphic::sqrt(d); }
     }
     
 
