@@ -18,7 +18,7 @@
 
 #include "CameraManip.h"
 
-namespace qtOWL {
+namespace cutee {
 
   // ------------------------------------------------------------------
   /*! camera manipulator with the following traits

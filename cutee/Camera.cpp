@@ -16,7 +16,7 @@
 
 #include "Camera.h"
 
-namespace qtOWL {
+namespace cutee {
 
   vec3f Camera::getFrom() const
   {

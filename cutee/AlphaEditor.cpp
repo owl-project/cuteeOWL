@@ -14,7 +14,7 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "qtOWL/XFEditor.h"
+#include "cutee/XFEditor.h"
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QMouseEvent>
@@ -22,7 +22,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-namespace qtOWL {
+namespace cutee {
 
   AlphaEditor::AlphaEditor(const ColorMap &cm)
     : colorMap(cm)

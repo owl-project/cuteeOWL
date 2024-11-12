@@ -17,7 +17,7 @@
 #include "InspectMode.h"
 #include "OWLViewer.h"
 
-namespace qtOWL {
+namespace cutee {
 
   const float kbd_rotate_degrees = 10.f;
   const float degrees_per_drag_fraction = 150;

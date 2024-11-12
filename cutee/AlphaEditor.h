@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "qtOWL/ColorMaps.h"
+#include "cutee/ColorMaps.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -32,10 +32,9 @@
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
 
-namespace qtOWL {
+namespace cutee {
 
-  using namespace owl;
-  using namespace owl::common;
+  using namespace cutee::common;
 
   typedef interval<float> range1f;
   
@@ -78,7 +77,7 @@ namespace qtOWL {
     QSize sizeHint() const override;
     
   signals:
-    void colorMapChanged(qtOWL::AlphaEditor *);
+    void colorMapChanged(cutee::AlphaEditor *);
 
   protected:
     void initializeGL() override;

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "qtOWL/AlphaEditor.h"
+#include "cutee/AlphaEditor.h"
 
 #include <QFormLayout>
 #include <QComboBox>
@@ -26,10 +26,9 @@
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
 
-namespace qtOWL {
+namespace cutee {
 
-  using namespace owl;
-  using namespace owl::common;
+  using namespace cutee::common;
 
   struct XFEditor;
 
@@ -59,7 +58,7 @@ namespace qtOWL {
     /*! the color map (in the alpha editor) got changed; either
         because the user drew in it, or selected anothe ron from the
         drobox, etc */
-    void colorMapChanged(qtOWL::XFEditor *);
+    void colorMapChanged(cutee::XFEditor *);
     void opacityScaleChanged(double);
     void rangeChanged(range1f);
 
@@ -70,7 +69,7 @@ namespace qtOWL {
 
     /*! the alpha editor child widget changed something to the color
         map*/
-    void alphaEditorChanged(qtOWL::AlphaEditor *ae);
+    void alphaEditorChanged(cutee::AlphaEditor *ae);
 
   private slots:
     /*! gets called by the absolute domain qlineedits */

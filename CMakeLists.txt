@@ -33,14 +33,9 @@ else()
   set(CUTEE_OWL_IS_SUBPROJECT OFF)
 endif()
 
-# ------------------------------------------------------------------
-# add owl, for vec3f stuff used in viewer
-# ------------------------------------------------------------------
-if (NOT TARGET owl::owl)
-  set(owl_dir ${CMAKE_SOURCE_DIR}/../owl)
-  add_subdirectory(${owl_dir} external_owl EXCLUDE_FROM_ALL)
-endif()
-
+#if (NOT (TARGET miniScene))
+#  add_subdirectory(../miniScene buildDir_miniScene EXCLUDE_FROM_ALL)
+#endif()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -63,7 +58,7 @@ set_property(TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
 # ------------------------------------------------------------------
 # the owlQT library with viewer widget etc
 # ------------------------------------------------------------------
-add_subdirectory(qtOWL)
+add_subdirectory(cutee)
 
 # ------------------------------------------------------------------
 # sample app(s)
@@ -71,7 +66,7 @@ add_subdirectory(qtOWL)
 
 IF (NOT CUTEE_OWL_IS_SUBPROJECT)
   set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
-  enable_language(CUDA)
+#  enable_language(CUDA)
   
   add_executable(sampleViewer apps/sample.cpp)
   set_property(TARGET sampleViewer PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
