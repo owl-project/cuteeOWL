@@ -18,6 +18,13 @@
 
 #pragma once
 
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+# define WITH_QT5
+#else
+# define WITH_QT6
+#endif
+
 #ifndef _USE_MATH_DEFINES
 #  define _USE_MATH_DEFINES
 #endif

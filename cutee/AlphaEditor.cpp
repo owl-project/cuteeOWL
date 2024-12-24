@@ -20,7 +20,10 @@
 #include <QMouseEvent>
 #include <math.h>
 #include <QApplication>
+
+#ifdef WITH_QT5
 #include <QDesktopWidget>
+#endif
 
 namespace cutee {
 
@@ -56,10 +59,15 @@ namespace cutee {
   
   QSize AlphaEditor::sizeHint() const
   {
+#ifdef WITH_QT5
     QRect rec = QApplication::desktop()->screenGeometry();
     int height = rec.height();
     int width = rec.width();
     return QSize(width/6, height/6);
+#else
+    std::cerr << "sizeHint() not available on Qt6 or newer..\n";
+    return QSize(-1,-1);
+#endif
   }
 
   void AlphaEditor::initializeGL()
