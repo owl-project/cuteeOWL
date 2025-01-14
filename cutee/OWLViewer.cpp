@@ -20,7 +20,10 @@
 #include <QMouseEvent>
 #include <math.h>
 #include <QApplication>
+
+#ifdef WITH_QT5
 #include <QDesktopWidget>
+#endif
 
 #include "InspectMode.h"
 #include "FlyMode.h"
@@ -127,10 +130,14 @@ namespace cutee {
     if (userSizeHint != vec2i(0))
       return QSize(userSizeHint.x,userSizeHint.y);
     else {
+#ifdef WITH_QT5
       QRect rec = QApplication::desktop()->screenGeometry();
       int height = rec.height();
       int width = rec.width();
       return QSize(width/2, height/2);
+#else
+      return QSize(800, 600);
+#endif
     }
   }
 
@@ -212,10 +219,15 @@ namespace cutee {
 
   vec2i OWLViewer::getScreenSize()
   {
+#ifdef WITH_QT5
     QRect rec = QApplication::desktop()->screenGeometry();
     int height = rec.height();
     int width = rec.width();
     return {width, height};
+#else
+    std::cerr << "getScreenSize() not available on Qt6 or newer..\n";
+    return {-1, -1};
+#endif
   }
 
   float computeStableEpsilon(float f)
@@ -540,7 +552,7 @@ namespace cutee {
       // leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonLeft(lastMousePos, pressed);
       break;
-    case Qt::MidButton://GLFW_MOUSE_BUTTON_MIDDLE:
+    case Qt::MiddleButton://GLFW_MOUSE_BUTTON_MIDDLE:
       centerButton.isPressed = pressed;
       // centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
       // centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
@@ -575,7 +587,7 @@ namespace cutee {
       // leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonLeft(lastMousePos, pressed);
       break;
-    case Qt::MidButton://GLFW_MOUSE_BUTTON_MIDDLE:
+    case Qt::MiddleButton://GLFW_MOUSE_BUTTON_MIDDLE:
       centerButton.isPressed = pressed;
       // centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
       // centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);

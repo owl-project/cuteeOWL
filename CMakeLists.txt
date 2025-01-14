@@ -46,13 +46,20 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # and in the 'real' app set the POSITION_INDEPENDENT_CODE flag to on, as well
 # as set CMAKE_CXX_COMPILE_OPTIONS_PIE to "-fPIC" for those targets that
 # actually use a C++ compiler that understands this.
-find_package(Qt5Widgets REQUIRED)
-get_property(core_options TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS)
+option(CUTEEOWL_FORCE_QT5 "Enforce the use of Qt5 even if newer available" OFF)
+if (NOT CUTEEOWL_FORCE_QT5)
+    find_package(Qt6 COMPONENTS Widgets)
+endif()
+if (NOT Qt6_FOUND)
+    # Require Qt 5.15 which adds version-less targets (Qt::XXX vs. Qt5::XXX)
+    find_package(Qt5 5.15 REQUIRED COMPONENTS Widgets)
+    get_property(core_options TARGET Qt::Core PROPERTY INTERFACE_COMPILE_OPTIONS)
+endif()
 if(${core_options})
 string(REPLACE "-fPIC" "" new_core_options ${core_options})
-set_property(TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options})
+set_property(TARGET Qt::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options})
 endif()
-set_property(TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET Qt::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
   
 
 # ------------------------------------------------------------------
@@ -70,7 +77,7 @@ IF (NOT CUTEE_OWL_IS_SUBPROJECT)
   
   add_executable(sampleViewer apps/sample.cpp)
   set_property(TARGET sampleViewer PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(sampleViewer PRIVATE qtOWL  Qt5::Widgets)
+  target_link_libraries(sampleViewer PRIVATE qtOWL  Qt::Widgets)
 endif()
 #endif()
 
