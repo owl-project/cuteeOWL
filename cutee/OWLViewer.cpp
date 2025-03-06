@@ -536,38 +536,28 @@ namespace cutee {
 
   void OWLViewer::mousePressEvent(QMouseEvent *event)
   {
-    const bool pressed = true;//(action == GLFW_PRESS);
+    const bool pressed = true;
     lastMousePos = getMousePos();
-        //Do stuff
 
     switch(event->button()) {
-    case Qt::LeftButton://GLFW_MOUSE_BUTTON_LEFT:
+    case Qt::LeftButton:
       leftButton.isPressed        = pressed;
       leftButton.shiftWhenPressed
         = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
       leftButton.ctrlWhenPressed
         = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
-      // leftButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // leftButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonLeft(lastMousePos, pressed);
       break;
-    case Qt::MiddleButton://GLFW_MOUSE_BUTTON_MIDDLE:
+    case Qt::MiddleButton:
       centerButton.isPressed = pressed;
-      // centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // centerButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonCenter(lastMousePos, pressed);
       break;
-    case Qt::RightButton://GLFW_MOUSE_BUTTON_RIGHT:
+    case Qt::RightButton:
       rightButton.isPressed = pressed;
-      // rightButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // rightButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // rightButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonRight(lastMousePos, pressed);
       break;
+    default:
     }
-    // // lastPos = event->pos();
   }
 
   void OWLViewer::mouseMoveEvent(QMouseEvent *event)
@@ -577,57 +567,24 @@ namespace cutee {
 
   void OWLViewer::mouseReleaseEvent(QMouseEvent *event)
   {
-    const bool pressed = false;//(action == GLFW_PRESS);
+    const bool pressed = false;
     lastMousePos = getMousePos();
     switch(event->button()) {
-    case Qt::LeftButton://GLFW_MOUSE_BUTTON_LEFT:
+    case Qt::LeftButton:
       leftButton.isPressed        = pressed;
-      // leftButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // leftButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonLeft(lastMousePos, pressed);
       break;
-    case Qt::MiddleButton://GLFW_MOUSE_BUTTON_MIDDLE:
+    case Qt::MiddleButton:
       centerButton.isPressed = pressed;
-      // centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // centerButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonCenter(lastMousePos, pressed);
       break;
-    case Qt::RightButton://GLFW_MOUSE_BUTTON_RIGHT:
+    case Qt::RightButton:
       rightButton.isPressed = pressed;
-      // rightButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // rightButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // rightButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonRight(lastMousePos, pressed);
       break;
+    default:
+      ;
     }
-    // // lastPos = event->pos();
-    // const bool pressed = false;//true;//(action == GLFW_PRESS);
-    //   lastMousePos = getMousePos();
-    //   switch(button) {
-    //   case GLFW_MOUSE_BUTTON_LEFT:
-    //     leftButton.isPressed        = pressed;
-    //     leftButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-    //     leftButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-    //     leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
-    //     mouseButtonLeft(lastMousePos, pressed);
-    //     break;
-    //   case GLFW_MOUSE_BUTTON_MIDDLE:
-    //     centerButton.isPressed = pressed;
-    //     centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-    //     centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-    //     centerButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
-    //     mouseButtonCenter(lastMousePos, pressed);
-    //     break;
-    //   case GLFW_MOUSE_BUTTON_RIGHT:
-    //     rightButton.isPressed = pressed;
-    //     rightButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-    //     rightButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-    //     rightButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
-    //     mouseButtonRight(lastMousePos, pressed);
-    //     break;
-    //   }
     emit clicked();
   }
 
