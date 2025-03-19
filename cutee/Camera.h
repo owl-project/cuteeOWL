@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "owl/common/math/box.h"
-#include "owl/common/math/LinearSpace.h"
+#include "cutee/common/math/box.h"
+#include "cutee/common/math/LinearSpace.h"
 
 #include <vector>
 #include <memory>
@@ -25,10 +25,9 @@
 #include <unistd.h>
 #endif
 
-namespace qtOWL {
+namespace cutee {
 
-  using namespace owl;
-  using namespace owl::common;
+  using namespace cutee::common;
   
   inline float toRadian(float deg) { return deg * float(M_PI/180.f); }
   inline float toDegrees(float rad) { return rad / float(M_PI/180.f); }
@@ -78,7 +77,7 @@ namespace qtOWL {
     void setUpVector(const vec3f &up)
     { upVector = up; forceUpFrame(); }
 
-    linear3f      frame         { one };
+    linear3f      frame;//         { one };
     vec3f         position      { 0,-1,0 };
     /*! distance to the 'point of interst' (poi); e.g., the point we
       will rotate around */

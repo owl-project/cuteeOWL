@@ -18,7 +18,7 @@
 
 #include "CameraManip.h"
 
-namespace qtOWL {
+namespace cutee {
 
   // ------------------------------------------------------------------
   /*! camera manipulator with the following traits
@@ -65,11 +65,11 @@ namespace qtOWL {
     void setRotateMode(RotateMode rm);
 
    /*! this gets called when the user presses a key on the keyboard ... */
-    virtual void key(char key, const vec2i &/*where*/);
+    void key(char key, const vec2i &/*where*/) override;
     
     /*! this gets called when the user presses a 'special' key on
       the keyboard (cursor keys) ... */
-    virtual void special(QKeyEvent *event, const vec2i &/*where*/);
+    void special(QKeyEvent *event, const vec2i &/*where*/) override;
 
     // /*! this gets called when the user presses a key on the keyboard ... */
     // virtual void key(QKeyEvent *event) override;
