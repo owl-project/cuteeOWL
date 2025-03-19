@@ -557,6 +557,7 @@ namespace cutee {
       mouseButtonRight(lastMousePos, pressed);
       break;
     default:
+      ;
     }
   }
 
