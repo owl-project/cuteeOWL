@@ -14,17 +14,15 @@
 # limitations under the License.                                           #
 # ======================================================================== #
 
-set(OpenGL_GL_PREFERENCE "LEGACY")
-find_package(OpenGL REQUIRED)
 
-if (NOT CUTEEOWL_FORCE_QT5)
-    find_package(Qt6 COMPONENTS Widgets OpenGLWidgets)
-endif()
-if (NOT Qt6_FOUND)
-    find_package(Qt5 5.15 REQUIRED COMPONENTS Widgets)
-    # Create dummy target for Qt::OpenGLWidgets as Qt5 does not have that
-    add_library(Qt::OpenGLWidgets INTERFACE IMPORTED)
-endif()
+#if (NOT CUTEEOWL_FORCE_QT5)
+#find_package(Qt6 COMPONENTS Widgets OpenGLWidgets)
+#endif()
+#if (NOT Qt6_FOUND)
+#    find_package(Qt5 5.15 REQUIRED COMPONENTS Widgets)
+#    # Create dummy target for Qt::OpenGLWidgets as Qt5 does not have that
+#    add_library(Qt::OpenGLWidgets INTERFACE IMPORTED)
+#endif()
 set(CMAKE_AUTOMOC ON)
 
 get_property(core_options TARGET Qt::Core PROPERTY INTERFACE_COMPILE_OPTIONS)
