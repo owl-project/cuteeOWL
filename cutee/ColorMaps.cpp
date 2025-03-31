@@ -14,12 +14,12 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "qtOWL/ColorMaps.h"
+#include "cutee/ColorMaps.h"
 
 #define STB_IMAGE_IMPLEMENTATION 1
 #include "stb/stb_image.h"
 
-namespace qtOWL {
+namespace cutee {
 
   uint8_t paraview_cool_warm[]
   = {

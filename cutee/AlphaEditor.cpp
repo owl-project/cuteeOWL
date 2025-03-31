@@ -14,15 +14,18 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "qtOWL/XFEditor.h"
+#include "cutee/XFEditor.h"
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QMouseEvent>
 #include <math.h>
 #include <QApplication>
-#include <QDesktopWidget>
 
-namespace qtOWL {
+#ifdef WITH_QT5
+#include <QDesktopWidget>
+#endif
+
+namespace cutee {
 
   AlphaEditor::AlphaEditor(const ColorMap &cm)
     : colorMap(cm)
@@ -56,10 +59,15 @@ namespace qtOWL {
   
   QSize AlphaEditor::sizeHint() const
   {
+#ifdef WITH_QT5
     QRect rec = QApplication::desktop()->screenGeometry();
     int height = rec.height();
     int width = rec.width();
     return QSize(width/6, height/6);
+#else
+    std::cerr << "sizeHint() not available on Qt6 or newer..\n";
+    return QSize(-1,-1);
+#endif
   }
 
   void AlphaEditor::initializeGL()

@@ -15,12 +15,12 @@
 // ======================================================================== //
 
 #include <cassert>
-#include "qtOWL/XFEditor.h"
+#include "cutee/XFEditor.h"
 #include <QLabel>
 #include <QtGlobal>
 #include <fstream>
 
-namespace qtOWL {
+namespace cutee {
 
   XFEditor::XFEditor() : XFEditor(range1f(0.f, 1.f)) {}
 
@@ -120,18 +120,18 @@ namespace qtOWL {
     // connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     connect(cmSelector, SIGNAL(currentIndexChanged(int)),
             this, SLOT(cmSelectionChanged(int)));
-    connect(alphaEditor, SIGNAL(colorMapChanged(qtOWL::AlphaEditor*)),
-            this, SLOT(alphaEditorChanged(qtOWL::AlphaEditor*)));
+    connect(alphaEditor, SIGNAL(colorMapChanged(cutee::AlphaEditor*)),
+            this, SLOT(alphaEditorChanged(cutee::AlphaEditor*)));
     connect(abs_domain_lower, QOverload<const QString &>::of(&QLineEdit::textChanged),
-            this, &qtOWL::XFEditor::emitAbsRangeChanged);
+            this, &cutee::XFEditor::emitAbsRangeChanged);
     connect(abs_domain_upper, QOverload<const QString &>::of(&QLineEdit::textChanged),
-            this, &qtOWL::XFEditor::emitAbsRangeChanged);
+            this, &cutee::XFEditor::emitAbsRangeChanged);
     connect(rel_domain_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this, &qtOWL::XFEditor::emitRelRangeChanged);
+            this, &cutee::XFEditor::emitRelRangeChanged);
     connect(rel_domain_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this, &qtOWL::XFEditor::emitRelRangeChanged);
+            this, &cutee::XFEditor::emitRelRangeChanged);
     connect(opacityScaleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this, &qtOWL::XFEditor::opacityScaleChanged);
+            this, &cutee::XFEditor::opacityScaleChanged);
   }
 
   /*! we'll have the qcombobox that selsects the desired color map
@@ -354,7 +354,7 @@ namespace qtOWL {
     int numColorMapValues = colorMap.size();
     out.write((char*)&numColorMapValues,sizeof(numColorMapValues));
     out.write((char*)colorMap.data(),colorMap.size()*sizeof(colorMap[0]));
-    std::cout << "#qtOWL.XFEditor: saved transfer function to "
+    std::cout << "#cutee.XFEditor: saved transfer function to "
               <<  fileName << std::endl;
   }
 
