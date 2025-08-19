@@ -20,22 +20,25 @@
 #include <QMouseEvent>
 #include <math.h>
 #include <QApplication>
+
+#ifdef WITH_QT5
 #include <QDesktopWidget>
+#endif
 
 #include "InspectMode.h"
 #include "FlyMode.h"
 #include <sstream>
 
-#if CUTEEOWL_USE_CUDA
-#include <cuda_runtime.h>
-#include <cuda_gl_interop.h>
-#endif
+// #if CUTEEOWL_USE_CUDA
+// #include <cuda_runtime.h>
+// #include <cuda_gl_interop.h>
+// #endif
 
 // eventually to go into 'apps/'
 #define STB_IMAGE_WRITE_IMPLEMENTATION 1
 #include "stb/stb_image_write.h"
 
-namespace qtOWL {
+namespace cutee {
 
   inline const char* getGLErrorString( GLenum error )
   {
@@ -127,10 +130,14 @@ namespace qtOWL {
     if (userSizeHint != vec2i(0))
       return QSize(userSizeHint.x,userSizeHint.y);
     else {
+#ifdef WITH_QT5
       QRect rec = QApplication::desktop()->screenGeometry();
       int height = rec.height();
       int width = rec.width();
       return QSize(width/2, height/2);
+#else
+      return QSize(800, 600);
+#endif
     }
   }
 
@@ -212,10 +219,15 @@ namespace qtOWL {
 
   vec2i OWLViewer::getScreenSize()
   {
+#ifdef WITH_QT5
     QRect rec = QApplication::desktop()->screenGeometry();
     int height = rec.height();
     int width = rec.width();
     return {width, height};
+#else
+    std::cerr << "getScreenSize() not available on Qt6 or newer..\n";
+    return {-1, -1};
+#endif
   }
 
   float computeStableEpsilon(float f)
@@ -267,16 +279,16 @@ namespace qtOWL {
   void OWLViewer::resize(const vec2i &newSize)
   {
     // glfwMakeContextCurrent(handle);
-#if CUTEEOWL_USE_CUDA
-    if (fbPointer)
-      cudaFree(fbPointer);
-    cudaMallocManaged(&fbPointer,newSize.x*newSize.y*sizeof(uint32_t));
-#else
-# pragma message("not building with CUDA toolkit, frame buffer allocated in host memory!")
+// #if CUTEEOWL_USE_CUDA
+//     if (fbPointer)
+//       cudaFree(fbPointer);
+//     cudaMallocManaged(&fbPointer,newSize.x*newSize.y*sizeof(uint32_t));
+// #else
+// # pragma message("not building with CUDA toolkit, frame buffer allocated in host memory!")
     if (fbPointer)
       delete[] fbPointer;
     fbPointer = new uint32_t[newSize.x*newSize.y];
-#endif
+// #endif
 
     fbSize = newSize;
     // bool firstResize = false;
@@ -285,12 +297,12 @@ namespace qtOWL {
       // firstResize = true;
     }
     else {
-#if CUTEEOWL_USE_CUDA
-      if (cuDisplayTexture) {
-        cudaGraphicsUnregisterResource(cuDisplayTexture);
-        cuDisplayTexture = 0;
-      }
-#endif
+// #if CUTEEOWL_USE_CUDA
+//       if (cuDisplayTexture) {
+//         cudaGraphicsUnregisterResource(cuDisplayTexture);
+//         cuDisplayTexture = 0;
+//       }
+// #endif
     }
 
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
@@ -298,41 +310,41 @@ namespace qtOWL {
     GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newSize.x, newSize.y, 0, GL_RGBA,
                           GL_UNSIGNED_BYTE, nullptr));
 
-#if CUTEEOWL_USE_CUDA
-    // We need to re-register when resizing the texture
-    cudaError_t rc = cudaGraphicsGLRegisterImage
-      (&cuDisplayTexture, fbTexture, GL_TEXTURE_2D, 0);
-#endif
+// #if CUTEEOWL_USE_CUDA
+//     // We need to re-register when resizing the texture
+//     cudaError_t rc = cudaGraphicsGLRegisterImage
+//       (&cuDisplayTexture, fbTexture, GL_TEXTURE_2D, 0);
+// #endif
 
     // if (firstResize || !firstResize && resourceSharingSuccessful) {
     //   const char *forceSlowDisplay = getenv("OWL_NO_CUDA_RESOURCE_SHARING");
-#if CUTEEOWL_FORCE_SLOW_DISPLAY
-# pragma message("forcing slow display in qt-owl viewer!")
+// #if CUTEEOWL_FORCE_SLOW_DISPLAY
+// # pragma message("forcing slow display in qt-owl viewer!")
     bool forceSlowDisplay = true;
-#else
-    bool forceSlowDisplay = false;
-#endif
+// #else
+//     bool forceSlowDisplay = false;
+// #endif
 
-#if CUTEEOWL_USE_CUDA
-    if (rc != cudaSuccess || forceSlowDisplay) {
-      std::cout << OWL_TERMINAL_RED
-                << "Warning: Could not do CUDA graphics resource sharing "
-                << "for the display buffer texture ("
-                << cudaGetErrorString(cudaGetLastError())
-                << ")... falling back to slower path"
-                << OWL_TERMINAL_DEFAULT
-                << std::endl;
-      resourceSharingSuccessful = false;
-      if (cuDisplayTexture) {
-        cudaGraphicsUnregisterResource(cuDisplayTexture);
-        cuDisplayTexture = 0;
-      }
-    } else {
-      resourceSharingSuccessful = true;
-    }
-#else
+// #if CUTEEOWL_USE_CUDA
+//     if (rc != cudaSuccess || forceSlowDisplay) {
+//       std::cout << OWL_TERMINAL_RED
+//                 << "Warning: Could not do CUDA graphics resource sharing "
+//                 << "for the display buffer texture ("
+//                 << cudaGetErrorString(cudaGetLastError())
+//                 << ")... falling back to slower path"
+//                 << OWL_TERMINAL_DEFAULT
+//                 << std::endl;
+//       resourceSharingSuccessful = false;
+//       if (cuDisplayTexture) {
+//         cudaGraphicsUnregisterResource(cuDisplayTexture);
+//         cuDisplayTexture = 0;
+//       }
+//     } else {
+//       resourceSharingSuccessful = true;
+//     }
+// #else
     resourceSharingSuccessful = false;
-#endif
+// #endif
     setAspect(fbSize.x/float(fbSize.y));
   }
 
@@ -343,22 +355,22 @@ namespace qtOWL {
   void OWLViewer::draw()
   {
     if (resourceSharingSuccessful) {
-#if CUTEEOWL_USE_CUDA
-      GL_CHECK(cudaGraphicsMapResources(1, &cuDisplayTexture));
+// #if CUTEEOWL_USE_CUDA
+//       GL_CHECK(cudaGraphicsMapResources(1, &cuDisplayTexture));
 
-      cudaArray_t array;
-      GL_CHECK(cudaGraphicsSubResourceGetMappedArray(&array, cuDisplayTexture, 0, 0));
-      {
-        cudaMemcpy2DToArray(array,
-                            0,
-                            0,
-                            reinterpret_cast<const void *>(fbPointer),
-                            fbSize.x * sizeof(uint32_t),
-                            fbSize.x * sizeof(uint32_t),
-                            fbSize.y,
-                            cudaMemcpyDeviceToDevice);
-      }
-#endif
+//       cudaArray_t array;
+//       GL_CHECK(cudaGraphicsSubResourceGetMappedArray(&array, cuDisplayTexture, 0, 0));
+//       {
+//         cudaMemcpy2DToArray(array,
+//                             0,
+//                             0,
+//                             reinterpret_cast<const void *>(fbPointer),
+//                             fbSize.x * sizeof(uint32_t),
+//                             fbSize.x * sizeof(uint32_t),
+//                             fbSize.y,
+//                             cudaMemcpyDeviceToDevice);
+//       }
+// #endif
     } else {
       GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
       glEnable(GL_TEXTURE_2D);
@@ -402,11 +414,11 @@ namespace qtOWL {
       glVertex3f((float)fbSize.x, 0.f, 0.f);
     }
     glEnd();
-#if CUTEEOWL_USE_CUDA
-    if (resourceSharingSuccessful) {
-      GL_CHECK(cudaGraphicsUnmapResources(1, &cuDisplayTexture));
-    }
-#endif
+// #if CUTEEOWL_USE_CUDA
+//     if (resourceSharingSuccessful) {
+//       GL_CHECK(cudaGraphicsUnmapResources(1, &cuDisplayTexture));
+//     }
+// #endif
   }
 
   /*! re-computes the 'camera' from the 'cameracontrol', and notify
@@ -524,38 +536,29 @@ namespace qtOWL {
 
   void OWLViewer::mousePressEvent(QMouseEvent *event)
   {
-    const bool pressed = true;//(action == GLFW_PRESS);
+    const bool pressed = true;
     lastMousePos = getMousePos();
-        //Do stuff
 
     switch(event->button()) {
-    case Qt::LeftButton://GLFW_MOUSE_BUTTON_LEFT:
+    case Qt::LeftButton:
       leftButton.isPressed        = pressed;
       leftButton.shiftWhenPressed
         = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
       leftButton.ctrlWhenPressed
         = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
-      // leftButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // leftButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonLeft(lastMousePos, pressed);
       break;
-    case Qt::MidButton://GLFW_MOUSE_BUTTON_MIDDLE:
+    case Qt::MiddleButton:
       centerButton.isPressed = pressed;
-      // centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // centerButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonCenter(lastMousePos, pressed);
       break;
-    case Qt::RightButton://GLFW_MOUSE_BUTTON_RIGHT:
+    case Qt::RightButton:
       rightButton.isPressed = pressed;
-      // rightButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // rightButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // rightButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonRight(lastMousePos, pressed);
       break;
+    default:
+      ;
     }
-    // // lastPos = event->pos();
   }
 
   void OWLViewer::mouseMoveEvent(QMouseEvent *event)
@@ -565,57 +568,24 @@ namespace qtOWL {
 
   void OWLViewer::mouseReleaseEvent(QMouseEvent *event)
   {
-    const bool pressed = false;//(action == GLFW_PRESS);
+    const bool pressed = false;
     lastMousePos = getMousePos();
     switch(event->button()) {
-    case Qt::LeftButton://GLFW_MOUSE_BUTTON_LEFT:
+    case Qt::LeftButton:
       leftButton.isPressed        = pressed;
-      // leftButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // leftButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonLeft(lastMousePos, pressed);
       break;
-    case Qt::MidButton://GLFW_MOUSE_BUTTON_MIDDLE:
+    case Qt::MiddleButton:
       centerButton.isPressed = pressed;
-      // centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // centerButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonCenter(lastMousePos, pressed);
       break;
-    case Qt::RightButton://GLFW_MOUSE_BUTTON_RIGHT:
+    case Qt::RightButton:
       rightButton.isPressed = pressed;
-      // rightButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-      // rightButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-      // rightButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
       mouseButtonRight(lastMousePos, pressed);
       break;
+    default:
+      ;
     }
-    // // lastPos = event->pos();
-    // const bool pressed = false;//true;//(action == GLFW_PRESS);
-    //   lastMousePos = getMousePos();
-    //   switch(button) {
-    //   case GLFW_MOUSE_BUTTON_LEFT:
-    //     leftButton.isPressed        = pressed;
-    //     leftButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-    //     leftButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-    //     leftButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
-    //     mouseButtonLeft(lastMousePos, pressed);
-    //     break;
-    //   case GLFW_MOUSE_BUTTON_MIDDLE:
-    //     centerButton.isPressed = pressed;
-    //     centerButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-    //     centerButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-    //     centerButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
-    //     mouseButtonCenter(lastMousePos, pressed);
-    //     break;
-    //   case GLFW_MOUSE_BUTTON_RIGHT:
-    //     rightButton.isPressed = pressed;
-    //     rightButton.shiftWhenPressed = (mods & GLFW_MOD_SHIFT  );
-    //     rightButton.ctrlWhenPressed  = (mods & GLFW_MOD_CONTROL);
-    //     rightButton.altWhenPressed   = (mods & GLFW_MOD_ALT    );
-    //     mouseButtonRight(lastMousePos, pressed);
-    //     break;
-    //   }
     emit clicked();
   }
 

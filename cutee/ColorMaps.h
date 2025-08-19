@@ -1,5 +1,5 @@
 // ======================================================================== //
-// Copyright 2019-2020 Ingo Wald                                            //
+// Copyright 2019-2024 Ingo Wald                                            //
 //                                                                          //
 // Licensed under the Apache License, Version 2.0 (the "License");          //
 // you may not use this file except in compliance with the License.         //
@@ -16,16 +16,17 @@
 
 #pragma once
 
-#include "owl/common/math/box.h"
-#include "owl/common/math/LinearSpace.h"
+// #include "owl/common/math/box.h"
+// #include "owl/common/math/LinearSpace.h"
+#include "cutee/common/math/box.h"
+#include "cutee/common/math/LinearSpace.h"
 #include <map>
 #include <vector>
 #include <string>
 
-namespace qtOWL {
+namespace cutee {
 
-  using namespace owl;
-  using namespace owl::common;
+  using namespace cutee::common;
 
   /*! convert PNG rgb image into a color map; if PNG doesn't have an
       alpha channel, alpha channel will be set to constant 1.f */

@@ -26,10 +26,9 @@
 #include <unistd.h>
 #endif
 
-namespace qtOWL {
+namespace cutee {
 
-  using namespace owl;
-  using namespace owl::common;
+  using namespace cutee::common;
   
   struct OWLViewer;
 

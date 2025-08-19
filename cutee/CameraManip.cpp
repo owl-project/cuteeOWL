@@ -17,7 +17,7 @@
 #include "CameraManip.h"
 #include "OWLViewer.h"
 
-namespace qtOWL {
+namespace cutee {
 
   /*! this gets called when the user presses a key on the keyboard ... */
   void CameraManipulator::key(char key, const vec2i &where)

@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "qtOWL/Camera.h"
-#include "qtOWL/CameraManip.h"
+#include "cutee/Camera.h"
+#include "cutee/CameraManip.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -30,7 +30,7 @@ typedef struct cudaGraphicsResource* cudaGraphicsResource_t;
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
 
-namespace qtOWL {
+namespace cutee {
   
   /*! base abstraction for a camera that can generate rays. For this
     viewer, we assume we're dealine with a camera that has a
