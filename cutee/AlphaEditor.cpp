@@ -212,11 +212,13 @@ namespace cutee {
     for (int x=x0;x<=x1;x++) {
       float f = (x0==x1)?1.f:((x-x0)/float(x1-x0));
       float y = (1.f-f)*from.y+f*to.y;
-      if (x>=0 && x<colorMap.size())
-        if (set)
+      if (x>=0 && x<colorMap.size()) {
+        if (set) {
           colorMap[x].w = min(1.f,max(0.f,y));
-        else
+        } else {
           colorMap[x].w = y > .65f ? 1.f : 0.f;
+        }
+      }
     }
   }
 

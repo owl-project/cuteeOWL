@@ -48,8 +48,14 @@ target_sources(qtOWL PRIVATE
 
   ColorMaps.h
   ColorMaps.cpp
-)
+  )
+if (APPLE)
+  target_link_libraries(qtOWL PUBLIC Qt::Widgets Qt::OpenGLWidgets
+    #OpenGL::GL
+    )
+else()
 target_link_libraries(qtOWL PUBLIC Qt::Widgets Qt::OpenGLWidgets OpenGL::GL)
+endif()
 target_include_directories(qtOWL PUBLIC ${CMAKE_CURRENT_LIST_DIR}/..)
 #if(CUDAToolkit_FOUND)
 #  target_link_libraries(qtOWL PUBLIC CUDA::cudart)
