@@ -51,7 +51,7 @@ find_package(OpenGL REQUIRED)
 # actually use a C++ compiler that understands this.
 #option(CUTEEOWL_FORCE_QT5 "Enforce the use of Qt5 even if newer available" OFF)
 #if (NOT CUTEEOWL_FORCE_QT5)
-find_package(Qt6 COMPONENTS Widgets  OpenGLWidgets)
+find_package(Qt6 COMPONENTS OpenGLWidgets)
 #endif()
 if (NOT Qt6_FOUND)
   # Require Qt 5.15 which adds version-less targets (Qt::XXX vs. Qt5::XXX)
