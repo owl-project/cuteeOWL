@@ -14,23 +14,14 @@
 # limitations under the License.                                           #
 # ======================================================================== #
 
-
-#if (NOT CUTEEOWL_FORCE_QT5)
-#find_package(Qt6 COMPONENTS Widgets OpenGLWidgets)
-#endif()
-#if (NOT Qt6_FOUND)
-#    find_package(Qt5 5.15 REQUIRED COMPONENTS Widgets)
-#    # Create dummy target for Qt::OpenGLWidgets as Qt5 does not have that
-#    add_library(Qt::OpenGLWidgets INTERFACE IMPORTED)
-#endif()
 set(CMAKE_AUTOMOC ON)
 
 get_property(core_options TARGET Qt::Core PROPERTY INTERFACE_COMPILE_OPTIONS)
 if(${core_options})
 string(REPLACE "-fPIC" "" new_core_options ${core_options})
 endif(${core_options})
-#set_property(TARGET Qt::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options})
-#set_property(TARGET Qt::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET Qt::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options})
+set_property(TARGET Qt::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
 
 
 add_library(qtOWL STATIC)
@@ -48,8 +39,14 @@ target_sources(qtOWL PRIVATE
 
   ColorMaps.h
   ColorMaps.cpp
-)
-target_link_libraries(qtOWL PUBLIC Qt::Widgets Qt::OpenGLWidgets OpenGL::GL)
+  )
+if (APPLE)
+  target_link_libraries(qtOWL PUBLIC Qt::Widgets Qt::OpenGLWidgets
+    #OpenGL::GL
+    )
+else()
+target_link_libraries(qtOWL PUBLIC Qt::Core Qt::Widgets Qt::OpenGLWidgets OpenGL::GL)
+endif()
 target_include_directories(qtOWL PUBLIC ${CMAKE_CURRENT_LIST_DIR}/..)
 #if(CUDAToolkit_FOUND)
 #  target_link_libraries(qtOWL PUBLIC CUDA::cudart)
