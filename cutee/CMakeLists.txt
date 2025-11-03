@@ -20,8 +20,8 @@ get_property(core_options TARGET Qt::Core PROPERTY INTERFACE_COMPILE_OPTIONS)
 if(${core_options})
 string(REPLACE "-fPIC" "" new_core_options ${core_options})
 endif(${core_options})
-set_property(TARGET Qt::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options})
-set_property(TARGET Qt::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
+#set_property(TARGET Qt::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options})
+#set_property(TARGET Qt::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
 
 
 add_library(qtOWL STATIC)
