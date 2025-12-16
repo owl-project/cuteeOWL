@@ -194,7 +194,9 @@ namespace cutee {
 
   void OWLViewer::resizeGL(int width, int height)
   {
-    resize({width,height});
+    float guiScale = QApplication::desktop()->devicePixelRatio();
+    
+    resize({guiScale*width,guiScale*height});
   }
 
 
@@ -346,14 +348,16 @@ namespace cutee {
     resourceSharingSuccessful = false;
 // #endif
     setAspect(fbSize.x/float(fbSize.y));
-  }
 
+  }
 
   /*! re-draw the current frame. This function itself isn't
     virtual, but it calls the framebuffer's render(), which
     is */
   void OWLViewer::draw()
   {
+    float guiScale = QApplication::desktop()->devicePixelRatio();
+    guiScale = 1.f;
     if (resourceSharingSuccessful) {
 // #if CUTEEOWL_USE_CUDA
 //       GL_CHECK(cudaGraphicsMapResources(1, &cuDisplayTexture));
@@ -393,11 +397,17 @@ namespace cutee {
 
     glDisable(GL_DEPTH_TEST);
 
-    glViewport(0, 0, fbSize.x, fbSize.y);
+    glViewport(0, 0,
+               guiScale*fbSize.x,
+               guiScale*fbSize.y);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.f, (float)fbSize.x, 0.f, (float)fbSize.y, -1.f, 1.f);
+    glOrtho(0.f,
+            (float)guiScale*fbSize.x,
+            0.f,
+            (float)guiScale*fbSize.y,
+            -1.f, 1.f);
 
     glBegin(GL_QUADS);
     {
@@ -405,15 +415,16 @@ namespace cutee {
       glVertex3f(0.f, 0.f, 0.f);
 
       glTexCoord2f(0.f, 1.f);
-      glVertex3f(0.f, (float)fbSize.y, 0.f);
+      glVertex3f(0.f, (float)guiScale*fbSize.y, 0.f);
 
       glTexCoord2f(1.f, 1.f);
-      glVertex3f((float)fbSize.x, (float)fbSize.y, 0.f);
+      glVertex3f((float)guiScale*fbSize.x, (float)guiScale*fbSize.y, 0.f);
 
       glTexCoord2f(1.f, 0.f);
       glVertex3f((float)fbSize.x, 0.f, 0.f);
     }
     glEnd();
+    glViewport(0, 0, fbSize.x, fbSize.y);
 // #if CUTEEOWL_USE_CUDA
 //     if (resourceSharingSuccessful) {
 //       GL_CHECK(cudaGraphicsUnmapResources(1, &cuDisplayTexture));
