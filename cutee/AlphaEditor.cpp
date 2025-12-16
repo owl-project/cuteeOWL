@@ -78,18 +78,19 @@ namespace cutee {
 
   void AlphaEditor::paintGL()
   {
+    float guiScale = QApplication::desktop()->devicePixelRatio();
     // makeCurrent();
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.f, width, 0.f, height, -1000.f, 1000.f);
-    glViewport(0.f, 0.f, width, height);
+    glOrtho(0.f, guiScale*width, 0.f, guiScale*height, -1000.f, 1000.f);
+    glViewport(0.f, 0.f, guiScale*width, guiScale*height);
       
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glScalef(width,height,1.f);
+    glScalef(guiScale*width,guiScale*height,1.f);
 
     // ------------------------------------------------------------------
     // paint background using window palette
