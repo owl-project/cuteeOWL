@@ -27,7 +27,9 @@
 
 namespace cutee {
 
-  using namespace cutee::common;
+  // using namespace cutee::common;
+  using cutee::common::vec3f;
+  using cutee::common::linear3f;
   
   inline float toRadian(float deg) { return deg * float(M_PI/180.f); }
   inline float toDegrees(float rad) { return rad / float(M_PI/180.f); }

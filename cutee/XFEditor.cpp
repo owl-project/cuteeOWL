@@ -24,10 +24,11 @@ namespace cutee {
 
   XFEditor::XFEditor() : XFEditor(range1f(0.f, 1.f)) {}
 
-  XFEditor::XFEditor(const range1f &domain)
-    : dataValueRange(domain)
+  XFEditor::XFEditor(const range1f &domain, int ID)
+    : dataValueRange(domain),
+      ID(ID)
   {
-    QGridLayout *gridLayout = new QGridLayout;//(2,2);
+    QGridLayout *gridLayout = new QGridLayout;
 
     // -------------------------------------------------------
     // general info:
@@ -74,31 +75,17 @@ namespace cutee {
 
     gridLayout->addWidget(rel_domain_lower,2,1);
     gridLayout->addWidget(rel_domain_upper,2,2);
-    // gridLayout->addWidget(new QLabel("lower"),0,0);
-    // gridLayout->addWidget(domain_lower,0,1);
-    // gridLayout->addWidget(new QLabel("upper"),1,0);
-    // gridLayout->addWidget(domain_upper,1,1);
 
     // -------------------------------------------------------
     // opacity scale
     // -------------------------------------------------------
     opacityScaleSpinBox = new QDoubleSpinBox;
-    // opacityScaleSpinBox->setDecimals(3);
-    // opacityScaleSpinBox->setValue(1.f);
-    // opacityScaleSpinBox->setRange(0.f,1.f);
-    // opacityScaleSpinBox->setSingleStep(.03f);
     opacityScaleSpinBox->setDecimals(3);
     opacityScaleSpinBox->setSingleStep(1.f);
     opacityScaleSpinBox->setRange(0.f,200.f);
     opacityScaleSpinBox->setValue(100.f);
     gridLayout->addWidget(new QLabel("opacity scale"),3,0);
     gridLayout->addWidget(opacityScaleSpinBox,3,1);
-
-    
-    // opacityScaleLayout->addWidget(new QLabel("Opacity scale"),0,0);
-    // opacityScaleLayout->addWidget(opacityScaleSpinBox);
-    // QWidget *opacityScaleWidget = new QWidget;
-    // opacityScaleWidget->setLayout(opacityScaleLayout);
 
     QWidget *valuesWidget = new QWidget;
     valuesWidget->setLayout(gridLayout);
@@ -117,7 +104,6 @@ namespace cutee {
     layout->addWidget(valuesWidget);
     setLayout(layout);
 
-    // connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     connect(cmSelector, SIGNAL(currentIndexChanged(int)),
             this, SLOT(cmSelectionChanged(int)));
     connect(alphaEditor, SIGNAL(colorMapChanged(cutee::AlphaEditor*)),
@@ -146,7 +132,6 @@ namespace cutee {
     map*/
   void XFEditor::alphaEditorChanged(AlphaEditor *ae)
   {
-    //colorMapChangedCB(&ae->xf);
     emit colorMapChanged(this);
     emit opacityScaleChanged(getOpacityScale());
     emit signal_rangeChanged();
@@ -189,6 +174,9 @@ namespace cutee {
     signal_rangeChanged();
   }
 
+  int             XFEditor::getID() const
+  { return ID; }
+  
   const ColorMap &XFEditor::getColorMap() const
   {
     return alphaEditor->getColorMap();

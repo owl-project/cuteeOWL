@@ -45,7 +45,7 @@ namespace cutee {
     XFEditor();
     /*! construct a new xf editor widget around the given 'domain'
         (ie, range of valid inputs) of a scalar field. */
-    XFEditor(const range1f &domain);
+    XFEditor(const range1f &domain, int ID = -1);
 
     /*! load either a transfer function written with saveTo(), or
         whole RGBA maps from a png file */
@@ -86,8 +86,10 @@ namespace cutee {
     range1f getAbsDomain() const;
     range1f getRelDomain() const;
     float   getOpacityScale() const;
+    
     const ColorMap &getColorMap() const;
-
+    int             getID() const;
+    
     void setColorMap(const std::vector<vec4f> &cm);
     void setAbsDomain(const range1f &range);
     void setRelDomain(const range1f &range);
@@ -103,6 +105,9 @@ namespace cutee {
     QDoubleSpinBox *rel_domain_upper;
     range1f         dataValueRange{0.f, 1.f};
     QDoubleSpinBox *opacityScaleSpinBox;
+    /*! user-supplied ID of this editor window, so uesr can have
+        multiple ones open for different XFs */
+    int             const ID = -1;
   };
 
 }
