@@ -78,7 +78,11 @@ namespace cutee {
 
   void AlphaEditor::paintGL()
   {
+#ifdef WITH_QT5
     float guiScale = QApplication::desktop()->devicePixelRatio();
+#else
+    float guiScale = devicePixelRatio();//1.f;
+#endif
     // makeCurrent();
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);

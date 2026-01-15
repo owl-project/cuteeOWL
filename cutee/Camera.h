@@ -18,7 +18,6 @@
 
 #include "cutee/common/math/box.h"
 #include "cutee/common/math/LinearSpace.h"
-
 #include <vector>
 #include <memory>
 #ifdef _GNUC_
@@ -27,7 +26,6 @@
 
 namespace cutee {
 
-  // using namespace cutee::common;
   using cutee::common::vec3f;
   using cutee::common::linear3f;
   

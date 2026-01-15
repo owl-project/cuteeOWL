@@ -43,15 +43,39 @@ target_sources(qtOWL PRIVATE
 if (APPLE)
   target_link_libraries(qtOWL PUBLIC Qt::Widgets Qt::OpenGLWidgets
     #OpenGL::GL
+    cuteeOWL-config
     )
 else()
-target_link_libraries(qtOWL PUBLIC Qt::Core Qt::Widgets Qt::OpenGLWidgets OpenGL::GL)
+  target_link_libraries(qtOWL PUBLIC
+    Qt::Core
+    Qt::Widgets
+    Qt::OpenGLWidgets
+    OpenGL::GL
+    cuteeOWL-config
+)
 endif()
 target_include_directories(qtOWL PUBLIC ${CMAKE_CURRENT_LIST_DIR}/..)
-#if(CUDAToolkit_FOUND)
-#  target_link_libraries(qtOWL PUBLIC CUDA::cudart)
-#target_compile_definitions(qtOWL PUBLIC CUTEEOWL_USE_CUDA=1)
 if (APPLE)
   target_compile_definitions(qtOWL PUBLIC -DGL_SILENCE_DEPRECATION=1)
 endif()
-#endif()
+
+# target_include_directories(qtOWL
+#   PUBLIC
+#   ${PROJECT_SOURCE_DIR}
+#   )
+# target_link_libraries(qtOWL #PUBLIC
+#   OpenGL::OpenGL
+#   cuteeOWL-config
+#   #  OpenGL::GL
+#   #  ${OPENGL_opengl_LIBRARY}
+#   #  ${CUDA_CUDA_LIBRARY}
+#   #  ${CUDA_CUDART_LIBRARY}
+# )
+  
+# qt5_use_modules(qtOWL
+#   Widgets
+#   )
+# macro(QT_OWL_LINK target)
+#   target_link_libraries(${target} ${QT_OWL_LIBRARIES})
+#   qt5_use_modules(${target} Widgets)
+# endmacro()

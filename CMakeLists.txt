@@ -22,20 +22,11 @@ endif()
 
 project(Cutee-OWL VERSION 0.0.1)
 
-# option(CUTEEOWL_USE_CUDA "Build with CUDA frame buffer implementation" ON)
-#if(CUTEEOWL_USE_CUDA)
-#  find_package(CUDAToolkit)
-#endif()
-
 if (NOT (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR}))
   set(CUTEE_OWL_IS_SUBPROJECT ON)
 else()
   set(CUTEE_OWL_IS_SUBPROJECT OFF)
 endif()
-
-#if (NOT (TARGET miniScene))
-#  add_subdirectory(../miniScene buildDir_miniScene EXCLUDE_FROM_ALL)
-#endif()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -71,6 +62,28 @@ if(${core_options})
 endif()
 #set_property(TARGET Qt::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
 
+# As moc files are generated in the binary dir, tell CMake
+# to always look for includes there:
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# ------------------------------------------------------------------
+# add owl, for vec3f stuff used in viewer
+# ------------------------------------------------------------------
+add_library(cuteeOWL-config INTERFACE)
+find_package(owl)
+if (owl_FOUND)
+  # all good - we found an installed version
+  target_link_libraries(cuteeOWL-config INTERFACE owl::owl)
+elseif (TARGET owl)
+  # all good - owl was already included, let's just use it
+  target_link_libraries(cuteeOWL-config INTERFACE owl::owl)
+elseif (EXISTS ${CMAKE_CURRENT_LIST_DIR}/../owl)
+  target_include_directories(cuteeOWL-config INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/../owl/include
+  )
+else()
+  message(FATAL "could not find owl; neither installed, nor as an existing target, nor as sibling dir ....!?")
+endif()
 
 # ------------------------------------------------------------------
 # the owlQT library with viewer widget etc
@@ -83,13 +96,10 @@ add_subdirectory(cutee)
 
 IF (NOT CUTEE_OWL_IS_SUBPROJECT)
   set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
-  #  enable_language(CUDA)
-  
   add_executable(sampleViewer apps/sample.cpp)
   set_property(TARGET sampleViewer PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE ON)
   target_link_libraries(sampleViewer PRIVATE qtOWL  Qt::Widgets)
 endif()
-#endif()
 
 
 

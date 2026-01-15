@@ -1,5 +1,5 @@
 // ======================================================================== //
-// Copyright 2019-2020 Ingo Wald                                            //
+// Copyright 2019-2026 Ingo Wald                                            //
 //                                                                          //
 // Licensed under the Apache License, Version 2.0 (the "License");          //
 // you may not use this file except in compliance with the License.         //
@@ -24,8 +24,6 @@
 #include <QTimer>
 #include <QApplication>
 #include <QMainWindow>
-
-typedef struct cudaGraphicsResource* cudaGraphicsResource_t;
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
@@ -235,7 +233,6 @@ namespace cutee {
     /*! what we'll return as sizeHint when qt asks us for it */
     vec2i    userSizeHint { 0,0 };
     GLuint   fbTexture  {0};
-    cudaGraphicsResource_t cuDisplayTexture { 0 };
     uint32_t *fbPointer { nullptr };
       
     /*! the glfw window handle */

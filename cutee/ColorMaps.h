@@ -16,8 +16,6 @@
 
 #pragma once
 
-// #include "owl/common/math/box.h"
-// #include "owl/common/math/LinearSpace.h"
 #include "cutee/common/math/box.h"
 #include "cutee/common/math/LinearSpace.h"
 #include <map>

@@ -20,14 +20,6 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-// #include <QOpenGLBuffer>
-// #include <QTimer>
-
-// #include <QLabel>
-// #include <QComboBox>
-// #include <QVBoxLayout>
-// #include <QFormLayout>
-// #include <QDoubleSpinBox>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
@@ -35,7 +27,7 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
 namespace cutee {
 
   using namespace cutee::common;
-
+  
   typedef interval<float> range1f;
   
   /*! a widget that displays - and allows to draw into the alpha

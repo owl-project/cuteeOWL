@@ -1,5 +1,5 @@
 // ======================================================================== //
-// Copyright 2019-2020 Ingo Wald                                            //
+// Copyright 2019-2026 Ingo Wald                                            //
 //                                                                          //
 // Licensed under the Apache License, Version 2.0 (the "License");          //
 // you may not use this file except in compliance with the License.         //
@@ -29,11 +29,6 @@
 #include "FlyMode.h"
 #include <sstream>
 
-// #if CUTEEOWL_USE_CUDA
-// #include <cuda_runtime.h>
-// #include <cuda_gl_interop.h>
-// #endif
-
 // eventually to go into 'apps/'
 #define STB_IMAGE_WRITE_IMPLEMENTATION 1
 #include "stb/stb_image_write.h"
@@ -55,8 +50,6 @@ namespace cutee {
       default:                     return "Unknown GL error";
       }
   }
-
-
 
 #define DO_GL_CHECK
 #ifdef DO_GL_CHECK
@@ -194,9 +187,13 @@ namespace cutee {
 
   void OWLViewer::resizeGL(int width, int height)
   {
+#ifdef WITH_QT5
     float guiScale = QApplication::desktop()->devicePixelRatio();
+#else
+    float guiScale = 1.f;
+#endif
     
-    resize({guiScale*width,guiScale*height});
+    resize({int(guiScale*width),int(guiScale*height)});
   }
 
 
@@ -280,75 +277,23 @@ namespace cutee {
 
   void OWLViewer::resize(const vec2i &newSize)
   {
-    // glfwMakeContextCurrent(handle);
-// #if CUTEEOWL_USE_CUDA
-//     if (fbPointer)
-//       cudaFree(fbPointer);
-//     cudaMallocManaged(&fbPointer,newSize.x*newSize.y*sizeof(uint32_t));
-// #else
-// # pragma message("not building with CUDA toolkit, frame buffer allocated in host memory!")
     if (fbPointer)
       delete[] fbPointer;
     fbPointer = new uint32_t[newSize.x*newSize.y];
-// #endif
-
     fbSize = newSize;
     // bool firstResize = false;
     if (fbTexture == 0) {
       GL_CHECK(glGenTextures(1, &fbTexture));
       // firstResize = true;
     }
-    else {
-// #if CUTEEOWL_USE_CUDA
-//       if (cuDisplayTexture) {
-//         cudaGraphicsUnregisterResource(cuDisplayTexture);
-//         cuDisplayTexture = 0;
-//       }
-// #endif
-    }
 
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
     // GL_CHECK(glActiveTexture(GL_TEXTURE0));
     GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newSize.x, newSize.y, 0, GL_RGBA,
-                          GL_UNSIGNED_BYTE, nullptr));
-
-// #if CUTEEOWL_USE_CUDA
-//     // We need to re-register when resizing the texture
-//     cudaError_t rc = cudaGraphicsGLRegisterImage
-//       (&cuDisplayTexture, fbTexture, GL_TEXTURE_2D, 0);
-// #endif
-
-    // if (firstResize || !firstResize && resourceSharingSuccessful) {
-    //   const char *forceSlowDisplay = getenv("OWL_NO_CUDA_RESOURCE_SHARING");
-// #if CUTEEOWL_FORCE_SLOW_DISPLAY
-// # pragma message("forcing slow display in qt-owl viewer!")
+                          GL_UNSIGNED_BYTE, fbPointer));
     bool forceSlowDisplay = true;
-// #else
-//     bool forceSlowDisplay = false;
-// #endif
-
-// #if CUTEEOWL_USE_CUDA
-//     if (rc != cudaSuccess || forceSlowDisplay) {
-//       std::cout << OWL_TERMINAL_RED
-//                 << "Warning: Could not do CUDA graphics resource sharing "
-//                 << "for the display buffer texture ("
-//                 << cudaGetErrorString(cudaGetLastError())
-//                 << ")... falling back to slower path"
-//                 << OWL_TERMINAL_DEFAULT
-//                 << std::endl;
-//       resourceSharingSuccessful = false;
-//       if (cuDisplayTexture) {
-//         cudaGraphicsUnregisterResource(cuDisplayTexture);
-//         cuDisplayTexture = 0;
-//       }
-//     } else {
-//       resourceSharingSuccessful = true;
-//     }
-// #else
     resourceSharingSuccessful = false;
-// #endif
     setAspect(fbSize.x/float(fbSize.y));
-
   }
 
   /*! re-draw the current frame. This function itself isn't
@@ -356,40 +301,20 @@ namespace cutee {
     is */
   void OWLViewer::draw()
   {
-    float guiScale = QApplication::desktop()->devicePixelRatio();
-    guiScale = 1.f;
-    if (resourceSharingSuccessful) {
-// #if CUTEEOWL_USE_CUDA
-//       GL_CHECK(cudaGraphicsMapResources(1, &cuDisplayTexture));
-
-//       cudaArray_t array;
-//       GL_CHECK(cudaGraphicsSubResourceGetMappedArray(&array, cuDisplayTexture, 0, 0));
-//       {
-//         cudaMemcpy2DToArray(array,
-//                             0,
-//                             0,
-//                             reinterpret_cast<const void *>(fbPointer),
-//                             fbSize.x * sizeof(uint32_t),
-//                             fbSize.x * sizeof(uint32_t),
-//                             fbSize.y,
-//                             cudaMemcpyDeviceToDevice);
-//       }
-// #endif
-    } else {
-      GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
-      glEnable(GL_TEXTURE_2D);
-      GL_CHECK(glTexSubImage2D(GL_TEXTURE_2D,0,
-                               0,0,
-                               fbSize.x, fbSize.y,
-                               GL_RGBA, GL_UNSIGNED_BYTE, fbPointer));
-    }
-
+    float guiScale = 1.f;//QApplication::desktop()->devicePixelRatio();
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
+    glEnable(GL_TEXTURE_2D);
+    GL_CHECK(glTexSubImage2D(GL_TEXTURE_2D,0,
+                             0,0,
+                             fbSize.x, fbSize.y,
+                             GL_RGBA, GL_UNSIGNED_BYTE, fbPointer));
+    
     glDisable(GL_LIGHTING);
     glColor3f(1, 1, 1);
-
+    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
+    
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, fbTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -425,11 +350,6 @@ namespace cutee {
     }
     glEnd();
     glViewport(0, 0, fbSize.x, fbSize.y);
-// #if CUTEEOWL_USE_CUDA
-//     if (resourceSharingSuccessful) {
-//       GL_CHECK(cudaGraphicsUnmapResources(1, &cuDisplayTexture));
-//     }
-// #endif
   }
 
   /*! re-computes the 'camera' from the 'cameracontrol', and notify
