@@ -494,7 +494,7 @@ namespace cutee {
 
   void OWLViewer::mouseMoveEvent(QMouseEvent *event)
   {
-    mouseMotion({event->x(),event->y()});
+    mouseMotion({(int)event->position().x(),(int)event->position().y()});
   }
 
   void OWLViewer::mouseReleaseEvent(QMouseEvent *event)
