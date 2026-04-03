@@ -278,19 +278,19 @@ namespace cutee {
     } else {
       float floatVal;
       in.read((char*)&floatVal,sizeof(floatVal));
-      if (floatVal < 20) {
-        std::cout << "=======================================================" << std::endl;
-        std::cout <<
-          "#cutee: warning - you seem to have loaded a very old\n"
-          "#cutee: transfer function .xf file with - according to\n"
-          "#cutee: how we currently store xf files - a *very* low\n"
-          "#cutee: density scale ... fixing this by trying to move\n"
-          "#cutee: this value into a more useful range ...\n"
-          "#cutee: ...but might want to consider updating that xf file!\n"
-          ;
-        std::cout << "=======================================================" << std::endl;
-        floatVal = std::max(80.f,std::min(120.f,floatVal*10));
-      }
+      // if (floatVal < 20) {
+      //   std::cout << "=======================================================" << std::endl;
+      //   std::cout <<
+      //     "#cutee: warning - you seem to have loaded a very old\n"
+      //     "#cutee: transfer function .xf file with - according to\n"
+      //     "#cutee: how we currently store xf files - a *very* low\n"
+      //     "#cutee: density scale ... fixing this by trying to move\n"
+      //     "#cutee: this value into a more useful range ...\n"
+      //     "#cutee: ...but might want to consider updating that xf file!\n"
+      //     ;
+      //   std::cout << "=======================================================" << std::endl;
+      //   floatVal = std::max(80.f,std::min(120.f,floatVal*10));
+      // }
 
       
       opacityScaleSpinBox->setValue(floatVal);
