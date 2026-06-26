@@ -22,6 +22,7 @@
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QLineEdit>
+#include <QCheckBox>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
@@ -61,6 +62,7 @@ namespace cutee {
     void colorMapChanged(cutee::XFEditor *);
     void opacityScaleChanged(double);
     void rangeChanged(range1f);
+    // void isosChanged(double);
 
   public slots:
     /*! we'll have the qcombobox that selsects the desired color map
@@ -70,12 +72,14 @@ namespace cutee {
     /*! the alpha editor child widget changed something to the color
         map*/
     void alphaEditorChanged(cutee::AlphaEditor *ae);
-
+    void isoConfigChanged(cutee::XFEditor *ae);
+                                                   
   private slots:
     /*! gets called by the absolute domain qlineedits */
     void emitAbsRangeChanged(const QString &);
     /*! gets called by the relative domain double spinners */
     void emitRelRangeChanged(double);
+    void emitIsosChanged(double);
 
   public:
     /* both different rangeChanged() signals route to this one
@@ -105,6 +109,15 @@ namespace cutee {
     QDoubleSpinBox *rel_domain_upper;
     range1f         dataValueRange{0.f, 1.f};
     QDoubleSpinBox *opacityScaleSpinBox;
+
+    enum { numIsos = 5 };
+    QDoubleSpinBox *isoSpinner[numIsos];
+    QDoubleSpinBox *isoColorR[numIsos];
+    QDoubleSpinBox *isoColorG[numIsos];
+    QDoubleSpinBox *isoColorB[numIsos];
+    QDoubleSpinBox *isoColorA[numIsos];
+    QCheckBox      *isoChecker[numIsos];
+    
     /*! user-supplied ID of this editor window, so uesr can have
         multiple ones open for different XFs */
     int             const ID = -1;

@@ -90,6 +90,56 @@ namespace cutee {
     QWidget *valuesWidget = new QWidget;
     valuesWidget->setLayout(gridLayout);
 
+    
+    QGridLayout *isoLayout = new QGridLayout;
+    // isoLayout->addWidget(new QLabel("opacity scale"),3,0);
+    for (int i=0;i<numIsos;i++) {
+      isoLayout->addWidget(new QLabel(("iso #"+std::to_string(i)).c_str()),i,0);
+      isoChecker[i] = new QCheckBox;
+      isoLayout->addWidget(isoChecker[i],i,1);
+      
+      isoSpinner[i] = new QDoubleSpinBox;
+      isoSpinner[i]->setValue(100*(i+.5)/numIsos);
+      isoSpinner[i]->setDecimals(3);
+      isoSpinner[i]->setRange(0.f,100.f);
+      isoSpinner[i]->setSingleStep(0.1f);
+      isoLayout->addWidget(isoSpinner[i],i,2);
+
+      isoLayout->addWidget(new QLabel("R:"),i,3);
+      isoColorR[i] = new QDoubleSpinBox;
+      isoColorR[i]->setValue(200);
+      isoColorR[i]->setDecimals(3);
+      isoColorR[i]->setRange(0.f,256.f);
+      isoColorR[i]->setSingleStep(1.f);
+      isoLayout->addWidget(isoColorR[i],i,4);
+      
+      isoLayout->addWidget(new QLabel("G:"),i,5);
+      isoColorG[i] = new QDoubleSpinBox;
+      isoColorG[i]->setValue(200);
+      isoColorG[i]->setDecimals(3);
+      isoColorG[i]->setRange(0.f,256.f);
+      isoColorG[i]->setSingleStep(1.f);
+      isoLayout->addWidget(isoColorG[i],i,6);
+
+      isoLayout->addWidget(new QLabel("B:"),i,7);
+      isoColorB[i] = new QDoubleSpinBox;
+      isoColorB[i]->setValue(200);
+      isoColorB[i]->setDecimals(3);
+      isoColorB[i]->setRange(0.f,256.f);
+      isoColorB[i]->setSingleStep(1.f);
+      isoLayout->addWidget(isoColorB[i],i,8);
+
+      isoLayout->addWidget(new QLabel("A:"),i,9);
+      isoColorA[i] = new QDoubleSpinBox;
+      isoColorA[i]->setValue(200);
+      isoColorA[i]->setDecimals(3);
+      isoColorA[i]->setRange(0.f,256.f);
+      isoColorA[i]->setSingleStep(1.f);
+      isoLayout->addWidget(isoColorB[i],i,10);
+    }
+    QWidget *isoWidget = new QWidget;
+    isoWidget->setLayout(isoLayout);
+    
     alphaEditor = new AlphaEditor(colorMaps.getMap(0));
 
     cmSelector = new QComboBox;
@@ -102,6 +152,7 @@ namespace cutee {
     layout->addWidget(alphaEditor);
     layout->addWidget(cmSelector);
     layout->addWidget(valuesWidget);
+    layout->addWidget(isoWidget);
     setLayout(layout);
 
     connect(cmSelector, SIGNAL(currentIndexChanged(int)),
@@ -118,6 +169,14 @@ namespace cutee {
             this, &cutee::XFEditor::emitRelRangeChanged);
     connect(opacityScaleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, &cutee::XFEditor::opacityScaleChanged);
+
+    for (int i=0;i<numIsos;i++) {
+      connect(isoSpinner[i], QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+              this, &cutee::XFEditor::emitIsosChanged);
+              // this, &cutee::XFEditor::isosChanged);
+      // connect(isoSpinner[i], SIGNAL(cutee::AlphaEditor*),
+      //         this, SLOT(isosChanged(cutee::AlphaEditor*)));
+    }
   }
 
   /*! we'll have the qcombobox that selsects the desired color map
@@ -137,6 +196,12 @@ namespace cutee {
     emit signal_rangeChanged();
   }
 
+  /*! the alpha editor child widget changed something to the color
+    map*/
+  void XFEditor::isoConfigChanged(XFEditor *ae)
+  { 
+  }
+  
   inline range1f order(const range1f v)
   {
     return { std::min(v.lower,v.upper),std::max(v.lower,v.upper) };
@@ -164,10 +229,18 @@ namespace cutee {
   }
 
   /*! one of the range spin boxes' value changed */
+  void XFEditor::emitIsosChanged(double)
+  {
+    PING;
+    emit isoConfigChanged(this);
+  }
+  
+  /*! one of the range spin boxes' value changed */
   void XFEditor::emitRelRangeChanged(double)
   {
     signal_rangeChanged();
   }
+
   /*! one of the range spin boxes' value changed */
   void XFEditor::emitAbsRangeChanged(const QString &)
   {
@@ -345,6 +418,5 @@ namespace cutee {
     std::cout << "#cutee.XFEditor: saved transfer function to "
               <<  fileName << std::endl;
   }
-
   
 }
