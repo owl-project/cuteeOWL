@@ -20,10 +20,15 @@
 #include <QMouseEvent>
 #include <math.h>
 #include <QApplication>
+#include <QSurfaceFormat>
+#include <QOpenGLContext>
+#include <QOpenGLVersionFunctionsFactory>
+#include <QLabel>
 
 #ifdef WITH_QT5
 #include <QDesktopWidget>
 #endif
+#include <QDebug>
 
 #include "InspectMode.h"
 #include "FlyMode.h"
@@ -98,19 +103,77 @@ namespace cutee {
                        bool visible)
     : userSizeHint(initWindowSize)
   {
-    connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
+    connect(&timer, SIGNAL(timeout()), this, SLOT(idle()));
     timer.start(1);
+    // connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
+    // timer.start(1);
 
+    graphicsView = new QGraphicsView(this);
+    setCentralWidget(graphicsView);
+    setMouseTracking(true);
+    graphicsView->setMouseTracking(true);
+    graphicsView->viewport()->installEventFilter(this);
+    centralWidget()->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    
+    QPixmap image;
+    image.load("hayStack.png");
+    // QLabel *label = new QLabel(this);
+    // label->setSceneRect(image.rect());
+    // label->setPixmap(image);
+    // setCentralWidget(label);
+    // label->setScaledContents(true);
+ 
+    graphicsScene = new QGraphicsScene(this);
+    graphicsScene->addPixmap(image);
+    // scene->setSceneRect(image.rect());
+    graphicsView->setScene(graphicsScene);
+    // initializeGL();
     if (initWindowSize != vec2i(0))
       ((QWidget *)this)->resize(QSize(initWindowSize.x,initWindowSize.y));
   }
 
+  void OWLViewer::idle()
+  {
+    static double lastCameraUpdate = -1.f;
+    if (camera.lastModified != lastCameraUpdate) {
+      cameraChanged();
+      lastCameraUpdate = camera.lastModified;
+    }
+    render();
 
+    QImage fb((uchar *)fbPointer,fbSize.x,fbSize.y,QImage::Format_ARGB32);
+    fb.flip(Qt::Vertical);
+    QPixmap image = QPixmap::fromImage(fb);
+
+    // QLabel *label = new QLabel(this);
+    // label->setSceneRect(image.rect());
+    // label->setPixmap(image);
+    // setCentralWidget(label);
+    // label->setScaledContents(true);
+ 
+    // graphicsScene = new QGraphicsScene(this);
+    graphicsScene->clear();
+    graphicsScene->addPixmap(image);
+
+    update();
+  }
 
   OWLViewer::~OWLViewer()
   {
     // makeCurrent();
     // doneCurrent();
+  }
+
+  void OWLViewer::paintEvent(QPaintEvent *event)
+  {
+    // render();
+    QMainWindow::paintEvent(event);
+  }
+  
+  void OWLViewer::resizeEvent(QResizeEvent *event)
+  {
+    resize(vec2i(event->size().width(),event->size().height()));
+    QMainWindow::resizeEvent(event);
   }
 
   QSize OWLViewer::minimumSizeHint() const
@@ -139,27 +202,38 @@ namespace cutee {
     setWindowTitle(s.c_str());
   }
 
-  void OWLViewer::initializeGL()
-  {
-    initializeOpenGLFunctions();
-    glDisable(GL_DEPTH_TEST);
-  }
+//   void OWLViewer::initializeGL()
+//   {
+//     QOpenGLContext *context = QOpenGLContext::currentContext();
+// qDebug() << "An OpenGL context is currently active.";
+    
+//     // You can query properties of the current context using format()
+//  PRINT(context);
+//     QSurfaceFormat format = context->format();
+//     qDebug() << "OpenGL Version:" << format.majorVersion() << "." << format.minorVersion();
 
-  /* this is the _QT_ widget event handler for redrawing .... */
-  void OWLViewer::paintGL()
-  {
-    static double lastCameraUpdate = -1.f;
-    if (camera.lastModified != lastCameraUpdate) {
-      cameraChanged();
-      lastCameraUpdate = camera.lastModified;
-    }
+    
+//     initializeOpenGLFunctions();
+//     legacyGL = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_1_4>(context);
 
-    // call virtual render method that asks child class to render into
-    // the fbPointer/frame buffer texture....
-    render();
-    // and display on the screen via opengl texture draw call
-    draw();
-  }
+//     legacyGL->glDisable(GL_DEPTH_TEST);
+//   }
+
+  // /* this is the _QT_ widget event handler for redrawing .... */
+  // void OWLViewer::paintGL()
+  // {
+  //   static double lastCameraUpdate = -1.f;
+  //   if (camera.lastModified != lastCameraUpdate) {
+  //     cameraChanged();
+  //     lastCameraUpdate = camera.lastModified;
+  //   }
+
+  //   // call virtual render method that asks child class to render into
+  //   // the fbPointer/frame buffer texture....
+  //   render();
+  //   // and display on the screen via opengl texture draw call
+  //   draw();
+  // }
 
   vec2i OWLViewer::getMousePos() const
   {
@@ -185,16 +259,16 @@ namespace cutee {
     QWidget::keyPressEvent(event);
   }
 
-  void OWLViewer::resizeGL(int width, int height)
-  {
-#ifdef WITH_QT5
-    float guiScale = QApplication::desktop()->devicePixelRatio();
-#else
-    float guiScale = 1.f;
-#endif
+//   void OWLViewer::resizeGL(int width, int height)
+//   {
+// #ifdef WITH_QT5
+//     float guiScale = QApplication::desktop()->devicePixelRatio();
+// #else
+//     float guiScale = 1.f;
+// #endif
     
-    resize({int(guiScale*width),int(guiScale*height)});
-  }
+//     resize({int(guiScale*width),int(guiScale*height)});
+//   }
 
 
   /*! helper function that dumps the current frame buffer in a png
@@ -282,75 +356,82 @@ namespace cutee {
     fbPointer = new uint32_t[newSize.x*newSize.y];
     fbSize = newSize;
     // bool firstResize = false;
-    if (fbTexture == 0) {
-      GL_CHECK(glGenTextures(1, &fbTexture));
-      // firstResize = true;
-    }
+    // if (fbTexture == 0) {
+    //   GL_CHECK(glGenTextures(1, &fbTexture));
+    //   // firstResize = true;
+    // }
 
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
-    // GL_CHECK(glActiveTexture(GL_TEXTURE0));
-    GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newSize.x, newSize.y, 0, GL_RGBA,
-                          GL_UNSIGNED_BYTE, fbPointer));
+    // GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
+    // // GL_CHECK(glActiveTexture(GL_TEXTURE0));
+    // GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newSize.x, newSize.y, 0, GL_RGBA,
+    //                       GL_UNSIGNED_BYTE, fbPointer));
     bool forceSlowDisplay = true;
     resourceSharingSuccessful = false;
     setAspect(fbSize.x/float(fbSize.y));
   }
 
   /*! re-draw the current frame. This function itself isn't
-    virtual, but it calls the framebuffer's render(), which
+    virtual, but it calls the framebuffer's render(, which
     is */
-  void OWLViewer::draw()
-  {
-    float guiScale = 1.f;//QApplication::desktop()->devicePixelRatio();
-    GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
-    glEnable(GL_TEXTURE_2D);
-    GL_CHECK(glTexSubImage2D(GL_TEXTURE_2D,0,
-                             0,0,
-                             fbSize.x, fbSize.y,
-                             GL_RGBA, GL_UNSIGNED_BYTE, fbPointer));
+//   void OWLViewer::draw()
+//   {
+//     // QPainter painter(this);
+//     // QImage image;
+//     // // Draw the QImage mapped directly to the widget boundaries
+//     // painter.drawImage(rect(), image);
+//     PING;
+// #if 0
+//     float guiScale = 1.f;//QApplication::desktop()->devicePixelRatio();
+//     GL_CHECK(glBindTexture(GL_TEXTURE_2D, fbTexture));
+//     glEnable(GL_TEXTURE_2D);
+//     GL_CHECK(glTexSubImage2D(GL_TEXTURE_2D,0,
+//                              0,0,
+//                              fbSize.x, fbSize.y,
+//                              GL_RGBA, GL_UNSIGNED_BYTE, fbPointer));
     
-    glDisable(GL_LIGHTING);
-    glColor3f(1, 1, 1);
+//     glDisable(GL_LIGHTING);
+//     glColor3f(1, 1, 1);
     
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+//     glMatrixMode(GL_MODELVIEW);
+//     glLoadIdentity();
     
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, fbTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//     glEnable(GL_TEXTURE_2D);
+//     glBindTexture(GL_TEXTURE_2D, fbTexture);
+//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glDisable(GL_DEPTH_TEST);
+//     glDisable(GL_DEPTH_TEST);
 
-    glViewport(0, 0,
-               guiScale*fbSize.x,
-               guiScale*fbSize.y);
+//     glViewport(0, 0,
+//                guiScale*fbSize.x,
+//                guiScale*fbSize.y);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0.f,
-            (float)guiScale*fbSize.x,
-            0.f,
-            (float)guiScale*fbSize.y,
-            -1.f, 1.f);
+//     glMatrixMode(GL_PROJECTION);
+//     glLoadIdentity();
+//     glOrtho(0.f,
+//             (float)guiScale*fbSize.x,
+//             0.f,
+//             (float)guiScale*fbSize.y,
+//             -1.f, 1.f);
 
-    glBegin(GL_QUADS);
-    {
-      glTexCoord2f(0.f, 0.f);
-      glVertex3f(0.f, 0.f, 0.f);
+//     glBegin(GL_QUADS);
+//     {
+//       glTexCoord2f(0.f, 0.f);
+//       glVertex3f(0.f, 0.f, 0.f);
 
-      glTexCoord2f(0.f, 1.f);
-      glVertex3f(0.f, (float)guiScale*fbSize.y, 0.f);
+//       glTexCoord2f(0.f, 1.f);
+//       glVertex3f(0.f, (float)guiScale*fbSize.y, 0.f);
 
-      glTexCoord2f(1.f, 1.f);
-      glVertex3f((float)guiScale*fbSize.x, (float)guiScale*fbSize.y, 0.f);
+//       glTexCoord2f(1.f, 1.f);
+//       glVertex3f((float)guiScale*fbSize.x, (float)guiScale*fbSize.y, 0.f);
 
-      glTexCoord2f(1.f, 0.f);
-      glVertex3f((float)fbSize.x, 0.f, 0.f);
-    }
-    glEnd();
-    glViewport(0, 0, fbSize.x, fbSize.y);
-  }
+//       glTexCoord2f(1.f, 0.f);
+//       glVertex3f((float)fbSize.x, 0.f, 0.f);
+//     }
+//     glEnd();
+//     glViewport(0, 0, fbSize.x, fbSize.y);
+// #endif
+//   }
 
   /*! re-computes the 'camera' from the 'cameracontrol', and notify
     app that the camera got changed */

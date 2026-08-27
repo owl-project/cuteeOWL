@@ -24,6 +24,10 @@
 #include <QTimer>
 #include <QApplication>
 #include <QMainWindow>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
+#include <QOpenGLFunctions_1_4>
+#include <QGraphicsView>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
@@ -54,12 +58,12 @@ namespace cutee {
     } lens;
   };
     
-  class OWLViewer : public QOpenGLWidget, protected QOpenGLFunctions
+  class OWLViewer : public QMainWindow//public QOpenGLWidget, protected QOpenGLFunctions
   {
     Q_OBJECT
 
   public:
-    using QOpenGLWidget::QOpenGLWidget;
+    // using QOpenGLWidget::QOpenGLWidget;
 
     // ------------------------------------------------------------------
     // VIEWER LOGIC
@@ -69,7 +73,6 @@ namespace cutee {
       useful for pbrt models in which the upvector sometimes isn't
       axis-aligend */
     static vec3f getUpVector(const vec3f &v);
-
 
     OWLViewer(const std::string &title = "OWL Sample Viewer",
               const vec2i &initWindowSize=vec2i(1200,800),
@@ -83,7 +86,7 @@ namespace cutee {
       
 
     ~OWLViewer();
-
+    
 
     /*! window notifies us that we got resized */     
     virtual void resize(const vec2i &newSize);
@@ -93,8 +96,8 @@ namespace cutee {
     /*! gets called whenever the viewer needs us to re-render out widget */
     virtual void render() {}
       
-    /*! draw framebuffer using OpenGL */
-    virtual void draw();
+    // /*! draw framebuffer using OpenGL */
+    // virtual void draw();
 
     struct ButtonState {
       bool  isPressed        { false };
@@ -225,6 +228,9 @@ namespace cutee {
     friend struct CameraInspectMode;
     friend struct CameraFlyMode;
 
+  public slots:
+    void idle();
+    
   protected:
 
     
@@ -234,7 +240,7 @@ namespace cutee {
     vec2i    userSizeHint { 0,0 };
     GLuint   fbTexture  {0};
     uint32_t *fbPointer { nullptr };
-      
+    QGraphicsScene *graphicsScene;
     /*! the glfw window handle */
     // GLFWwindow *handle { nullptr };
     vec2i lastMousePos = { -1,-1 };
@@ -259,17 +265,20 @@ namespace cutee {
     void clicked();
 
   protected:
-    void initializeGL() override;
-    void paintGL() override;
-    void resizeGL(int width, int height) override;
+    // void initializeGL() override;
+    // void paintGL() override;
+    // void resizeGL(int width, int height) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
     // void resizeEvent(QResizeEvent* event) override;
 
 
   private:
+    QGraphicsView *graphicsView;
     // void makeObject();
 
     // QColor clearColor = Qt::black;
