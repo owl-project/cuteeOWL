@@ -141,7 +141,7 @@ namespace cutee {
     }
     render();
 
-    QImage fb((uchar *)fbPointer,fbSize.x,fbSize.y,QImage::Format_ARGB32);
+    QImage fb((uchar *)fbPointer,fbSize.x,fbSize.y,QImage::Format_RGBA8888);//Format_ABGR32);
     fb.flip(Qt::Vertical);
     QPixmap image = QPixmap::fromImage(fb);
 
