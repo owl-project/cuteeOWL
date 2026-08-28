@@ -22,7 +22,6 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 #include <QOpenGLContext>
-#include <QOpenGLVersionFunctionsFactory>
 #include <QLabel>
 
 #ifdef WITH_QT5
@@ -114,7 +113,9 @@ namespace cutee {
     graphicsView->setMouseTracking(true);
     graphicsView->viewport()->installEventFilter(this);
     centralWidget()->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    
+    graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     QPixmap image;
     image.load("hayStack.png");
     // QLabel *label = new QLabel(this);
@@ -144,7 +145,7 @@ namespace cutee {
     QImage fb((uchar *)fbPointer,fbSize.x,fbSize.y,QImage::Format_RGBA8888);//Format_ABGR32);
     fb.flip(Qt::Vertical);
     QPixmap image = QPixmap::fromImage(fb);
-
+ 
     // QLabel *label = new QLabel(this);
     // label->setSceneRect(image.rect());
     // label->setPixmap(image);
