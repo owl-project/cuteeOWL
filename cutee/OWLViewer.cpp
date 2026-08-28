@@ -22,7 +22,6 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 #include <QOpenGLContext>
-#include <QOpenGLVersionFunctionsFactory>
 #include <QLabel>
 
 #ifdef WITH_QT5
@@ -142,8 +141,9 @@ namespace cutee {
     render();
 
     QImage fb((uchar *)fbPointer,fbSize.x,fbSize.y,QImage::Format_RGBA8888);//Format_ABGR32);
-    fb.flip(Qt::Vertical);
-    QPixmap image = QPixmap::fromImage(fb);
+    // fb.flip(Qt::Vertical);
+    // QPixmap image = QPixmap::fromImage(fb);
+    QPixmap image = QPixmap::fromImage(fb.mirrored(false,true));
 
     // QLabel *label = new QLabel(this);
     // label->setSceneRect(image.rect());
