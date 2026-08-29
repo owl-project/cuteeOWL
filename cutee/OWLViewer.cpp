@@ -143,8 +143,9 @@ namespace cutee {
     render();
 
     QImage fb((uchar *)fbPointer,fbSize.x,fbSize.y,QImage::Format_RGBA8888);//Format_ABGR32);
-    fb.flip(Qt::Vertical);
-    QPixmap image = QPixmap::fromImage(fb);
+    // fb.flip(Qt::Vertical);
+    QPixmap image = QPixmap::fromImage(fb.mirrored(false,true));
+    // QPixmap image = QPixmap::fromImage(fb);
  
     // QLabel *label = new QLabel(this);
     // label->setSceneRect(image.rect());
@@ -154,6 +155,7 @@ namespace cutee {
  
     // graphicsScene = new QGraphicsScene(this);
     graphicsScene->clear();
+    graphicsScene->setSceneRect(0,0,fbSize.x,fbSize.y);
     graphicsScene->addPixmap(image);
 
     update();
